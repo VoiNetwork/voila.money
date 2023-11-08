@@ -62,7 +62,7 @@ const NFTs: React.FC = () => {
       <h1 className="font-bold text-center md:text-left text-3xl md:text-5xl py-4">
         Your <span className="blue">NFT</span> portfolio
       </h1>
-      <div className="flex flex-col justify-center items-start space-y-8">
+      <div className="flex flex-col justify-center space-y-8">
         {(account?.amount || 0) > 0 && (
           <>
             <div className="flex w-full justify-center md:justify-end">
@@ -70,7 +70,7 @@ const NFTs: React.FC = () => {
                 <IconButton IconComponent={FaPlus} name="Add assets" />
               </Link>
             </div>
-            <div className="flex w-full flex-col space-y-2">
+            <div className="flex w-full justify-center space-y-2">
               {holdingAssets.length > 0 ? (
                 holdingAssets.map((a: any) => (
                   <AssetCard
@@ -81,7 +81,7 @@ const NFTs: React.FC = () => {
                   />
                 ))
               ) : (
-                <Card className="opacity-50">
+                <Card className="opacity-50 justify-center">
                   <div className="text-center w-full">
                     No NFTs to be found here. Add some?
                   </div>
