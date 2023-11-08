@@ -78,16 +78,15 @@ const Create: React.FC = () => {
         <div className="opacity-80 pt-4">
           Your private key will be securely stored in a backup file
         </div>
-        <div className="p-4 flex justify-between">
-
-          <div className='w-1/3'>
+        <div className="p-4 flex justify-center w-full gap-8">
+          <div className=''>
             <Link to={'/accounts'}>
               <IconButton IconComponent={FaChevronLeft} name="Cancel">
                 <div>Back</div>
               </IconButton>
             </Link>
           </div>
-          <div className='w-1/3'>
+          <div className=''>
             <IconButton
               onClick={saveAccount}
               IconComponent={FaSave}
