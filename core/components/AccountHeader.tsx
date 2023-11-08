@@ -24,7 +24,7 @@ const AccountHeader: React.FC = () => {
     } catch (e) {
       toast.error(
         'Something went wrong while setting primary address: ' +
-          (e as Error)?.message
+        (e as Error)?.message
       );
     }
   };
@@ -34,22 +34,23 @@ const AccountHeader: React.FC = () => {
       <div className="max-w-screen-2xl flex flex-col w-full justify-center items-center">
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center space-x-4 h-[80px]">
-            <IconButton
-              IconComponent={FaEllipsisH}
-              name="Configure accounts"
-              onClick={() => navigate('/accounts')}
-            />
+            <div>
+              <IconButton
+                IconComponent={FaEllipsisH}
+                name="Configure accounts"
+                onClick={() => navigate('/accounts')}
+              />
+            </div>
             {state.addresses.map((address) => (
               <div
                 key={`ava-${address}`}
                 onClick={updatePrimaryAddress(address)}
                 onMouseEnter={() => setTempAddress(address)}
                 onMouseLeave={() => setTempAddress('')}
-                className={`transition-all cursor-pointer ${
-                  state.primaryAddress === address
+                className={`transition-all cursor-pointer ${state.primaryAddress === address
                     ? 'max-w-[80px] max-h-[80px]'
                     : 'max-w-[42px] max-h-[42px] hover:max-w-[64px] hover:max-h-[64px]'
-                }`}
+                  }`}
               >
                 <Avatar content={address} className={'min-w-max min-h-max'} />
               </div>

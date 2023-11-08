@@ -39,7 +39,7 @@ const Backup: React.FC = () => {
         t(
           'view.Accounts.Backup.SomethingWentWrong',
           'Something went wrong while trying to create backup: ' +
-            (e as Error)?.message
+          (e as Error)?.message
         )
       );
     }
@@ -71,12 +71,14 @@ const Backup: React.FC = () => {
             onEnter={downloadBackup}
           />
         </div>
-        <div className="p-4 flex space-x-4">
-          <Link to={'/accounts'}>
-            <IconButton IconComponent={FaChevronLeft} name="Cancel">
-              <span>Back</span>
-            </IconButton>
-          </Link>
+        <div className="p-4 flex space-x-4 justify-center w-full">
+          <div className=''>
+            <Link to={'/accounts'}>
+              <IconButton IconComponent={FaChevronLeft} name="Cancel">
+                <span>Back</span>
+              </IconButton>
+            </Link>
+          </div>
           <IconButton
             onClick={downloadBackup}
             IconComponent={FaDownload}
