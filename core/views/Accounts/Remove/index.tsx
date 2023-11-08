@@ -44,7 +44,7 @@ const Remove: React.FC = () => {
         console.error(e);
         toast.error(
           'Something went wrong while removing account. Time to reconsider? ' +
-            (e as Error)?.message
+          (e as Error)?.message
         );
       }
     }
@@ -53,7 +53,7 @@ const Remove: React.FC = () => {
   return (
     <div>
       <Modal open={modalOpen} onClose={closeModal}>
-        <Card className="flex space-y-2 flex-col justify-center items-center text-base">
+        <Card className="flex space-y-2 flex-col justify-center items-center text-center">
           <div>
             You are about to <b className="text-red-500">permanently</b> remove
             this address and associated <b>private key</b>.
@@ -61,7 +61,7 @@ const Remove: React.FC = () => {
           <div>
             <div className="flex space-x-2 items-center p-4">
               <Avatar content={addressToRemove || ''} className="h-8 w-8" />
-              <CopiableText text={addressToRemove} />
+              <CopiableText text={addressToRemove} showCopiedText={false} />
             </div>
           </div>
           <div>
@@ -70,23 +70,28 @@ const Remove: React.FC = () => {
           </div>
           <div>Are you sure about this?</div>
           <div className="p-4 flex space-x-4">
-            <IconButton
-              IconComponent={FaTimes}
-              onClick={closeModal}
-              name="Cancel"
-              primary
-            >
-              <span>No, keep account</span>
-            </IconButton>
-            <IconButton
-              onClick={removeAccount}
-              IconComponent={FaTrash}
-              name="Remove"
-              primary
-              danger
-            >
-              <span>Yes, remove account</span>
-            </IconButton>
+            <div>
+              <IconButton
+                IconComponent={FaTimes}
+                onClick={closeModal}
+                name="Cancel"
+                primary
+              >
+                <span>No, keep account</span>
+              </IconButton>
+            </div>
+            <div>
+              <IconButton
+                onClick={removeAccount}
+                IconComponent={FaTrash}
+                name="Remove"
+                primary
+                danger
+              >
+                <span>Yes, remove account</span>
+              </IconButton>
+            </div>
+
           </div>
         </Card>
       </Modal>
