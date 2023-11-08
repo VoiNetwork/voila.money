@@ -99,78 +99,82 @@ const Login: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <Lottie
-        loop={false}
-        autoplay={true}
-        animationData={isDark ? animationDark : animationLight}
-        rendererSettings={{
-          preserveAspectRatio: 'xMidYMid slice',
-        }}
-        height={state.display === 'tab' ? 400 : 240}
-        width={state.display === 'tab' ? 400 : 240}
-      />
-      {passwordSet !== undefined && (
-        <>
-          <h1 className="text-2xl md:text-4xl font-bold">
-            {passwordSet
-              ? t('view.Login.WelcomeBack', 'Welcome back!')
-              : t('view.Login.Welcome', 'Welcome!')}
-          </h1>
-          <h1 className="text-md md:text-lg font-light">
-            {passwordSet
-              ? t('view.Login.EnterPassword', 'Enter your password')
-              : t(
+    <div className="flex flex-col h-full w-full justify-center">
+      <div className='h-1/2 flex justify-center w-full'>
+        <Lottie
+          loop={false}
+          autoplay={true}
+          animationData={isDark ? animationDark : animationLight}
+          rendererSettings={{
+            preserveAspectRatio: 'xMidYMid slice',
+          }}
+          height={state.display === 'tab' ? 300 : 200}
+          width={state.display === 'tab' ? 300 : 200}
+        />
+      </div>
+      <div className='h-1/2 flex-col justify-center text-center w-full'>
+        {passwordSet !== undefined && (
+          <>
+            <h1 className="text-2xl md:text-4xl font-bold text-center">
+              {passwordSet
+                ? t('view.Login.WelcomeBack', 'Welcome back!')
+                : t('view.Login.Welcome', 'Welcome!')}
+            </h1>
+            <h1 className="text-md md:text-lg font-light text-center">
+              {passwordSet
+                ? t('view.Login.EnterPassword', 'Enter your password')
+                : t(
                   'view.Login.SetupPassword',
                   'Set up your password - at least 8 characters'
                 )}
-          </h1>
-          <div className="text-center flex items-center">
-            <Input
-              icon={<FaLock />}
-              type="password"
-              placeholder={t('view.Login.Password', 'Password') as string}
-              value={password}
-              onChange={setPassword}
-              onEnter={login}
-            />
-          </div>
-          {!passwordSet && (
-            <div className="text-center pt-4 flex space-x-2 items-center">
+            </h1>
+            <div className="text-center flex justify-center">
               <Input
                 icon={<FaLock />}
                 type="password"
-                placeholder={
-                  t('view.Login.ConfirmPassword', 'Confirm password') as string
-                }
-                value={confirmPassword}
-                onChange={setConfirmPassword}
+                placeholder={t('view.Login.Password', 'Password') as string}
+                value={password}
+                onChange={setPassword}
                 onEnter={login}
               />
             </div>
-          )}
-          {isCapsLockOn && (
-            <span className="text-red-400 font-bold pt-2">
-              Caps Lock is on!
-            </span>
-          )}
-          <div className="max-w-min pt-8">
-            <IconButton
-              IconComponent={FaSignInAlt}
-              name={'Enter'}
-              onClick={login}
-              disabled={
-                loginDisabled ||
-                (!passwordSet && confirmPassword !== password) ||
-                !password ||
-                password.length < 8
-              }
-            >
-              <span>{t('view.Login.Enter', 'Enter')}</span>
-            </IconButton>
-          </div>
-        </>
-      )}
+            {!passwordSet && (
+              <div className="text-center pt-4 flex space-x-2 justify-center">
+                <Input
+                  icon={<FaLock />}
+                  type="password"
+                  placeholder={
+                    t('view.Login.ConfirmPassword', 'Confirm password') as string
+                  }
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
+                  onEnter={login}
+                />
+              </div>
+            )}
+            {isCapsLockOn && (
+              <span className="text-red-400 font-bold pt-2">
+                Caps Lock is on!
+              </span>
+            )}
+            <div className="p-6 flex justify-center w-full">
+              <IconButton
+                IconComponent={FaSignInAlt}
+                name={'Enter'}
+                onClick={login}
+                disabled={
+                  loginDisabled ||
+                  (!passwordSet && confirmPassword !== password) ||
+                  !password ||
+                  password.length < 8
+                }
+              >
+                <span>{t('view.Login.Enter', 'Enter')}</span>
+              </IconButton>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
