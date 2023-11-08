@@ -30,7 +30,7 @@ const AccountHeader: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full justify-center md:h-1/3">
+    <div className="flex w-full justify-center md:h-1/3 shadow-sm">
       <div className="max-w-screen-2xl flex flex-col w-full justify-center items-center">
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center space-x-4 h-[80px]">
