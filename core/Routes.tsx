@@ -41,7 +41,7 @@ const Routes: FC = () => {
           <div className="h-full w-full overflow-y-auto flex-col text-sm">
             <Sidebar disabled={state.addresses.length === 0} />
             <div className="p-2 md:px-16 w-full flex-col">
-              <div className="w-full max-w-full px-4 max-w-screen-2xl">
+              <div className="w-full max-w-full px-4">
                 <BrowserRoutes>
                   <Route
                     index

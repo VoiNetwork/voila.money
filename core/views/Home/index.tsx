@@ -83,7 +83,7 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="flex w-full justify-center">
+        <div className="flex w-full justify-center md:justify-end">
           <Link to="opt">
             <IconButton IconComponent={FaPlus} name="Add assets" />
           </Link>
