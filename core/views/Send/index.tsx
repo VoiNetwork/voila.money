@@ -17,6 +17,10 @@ import { useStore } from '../../utils/store';
 import { classNames } from '../../utils/common';
 import assetPlaceholder from '../../assets/asset.png';
 import Amount from '../../components/Amount';
+import { useSecureStorage } from '../../utils/storage';
+import algosdk from 'algosdk';
+import toast from 'react-hot-toast';
+import { Buffer } from 'buffer';
 
 const Send: React.FC = () => {
   const { account, assets } = useAccount();
@@ -25,6 +29,7 @@ const Send: React.FC = () => {
   const [receiver, setReceiver] = useState('');
   const { state } = useStore();
   const { id } = useParams();
+  const storage = useSecureStorage();
 
   const asset: {
     name: string;
@@ -71,7 +76,35 @@ const Send: React.FC = () => {
 
   const closeModal = () => setModalOpen(false);
 
-  const send = () => {
+  const send = async () => {
+    try {
+      if (account?.address) {
+        const suggestedParams = await state.node.getTransactionParams().do();
+        const ptxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+          from: account.address,
+          suggestedParams,
+          to: receiver,
+          amount: asset.amount,
+          note: new Uint8Array(Buffer.from('Voila!')),
+        });
+        console.log("send account.address", account.address)
+        let txns = [
+          ptxn
+        ];
+        let txgroup = algosdk.assignGroupID(txns);
+        let response = await storage.signTransactions(
+          [txgroup],
+          account.address
+        );
+        console.log("response", response)
+        let decodedResponse = Buffer.from(response[0][0].blob).toString('base64');
+        console.log(JSON.stringify(response[0][0].txID));
+        console.log(JSON.stringify(decodedResponse));
+        // toast.success(response[0][0]["txID"]);
+      }
+    } catch (exception) {
+      console.error(exception)
+    }
     closeModal();
   };
 
@@ -120,7 +153,7 @@ const Send: React.FC = () => {
                         className={classNames(
                           'shadow-lg rounded-full text-white w-8 h-8',
                           !state.network.isMainnet &&
-                            'bg-orange-500 dark:bg-orange-600 p-1'
+                          'bg-orange-500 dark:bg-orange-600 p-1'
                         )}
                       />
                     </div>

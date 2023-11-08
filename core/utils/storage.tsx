@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import IconButton from '../components/IconButton';
 import { IS_DEVELOPMENT } from './common';
+import algosdk from 'algosdk';
 
 export const SecureMessageTypes = {
   setPassword: 'setPassword',
@@ -167,6 +168,13 @@ export class SecureStorage {
   async createBackup(password: string): Promise<string> {
     return await this.handleMessage(SecureMessageTypes.createBackup, {
       password,
+    });
+  }
+
+  async signTransactions(groups: algosdk.TransactionLike[][], address: string): Promise<{ txID: string; blob: Uint8Array; }[][]> {
+    console.log("signTransactions - address", address);
+    return await this.handleMessage(SecureMessageTypes.signTransactions, {
+      groups, address
     });
   }
 
