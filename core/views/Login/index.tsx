@@ -165,8 +165,7 @@ const Login: React.FC = () => {
                 disabled={
                   loginDisabled ||
                   (!passwordSet && confirmPassword !== password) ||
-                  !password ||
-                  password.length < 8
+                  !password
                 }
               >
                 <span>{t('view.Login.Enter', 'Enter')}</span>
