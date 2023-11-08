@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSecureStorage } from '../../../utils/storage';
 import { ActionTypes, useStore } from '../../../utils/store';
 import Avatar from '../../../components/Avatar';
-import AccountName from '../../../components/AccountName';
+import CopiableText from '../../../components/CopiableText';
 import IconButton from '../../../components/IconButton';
 import { FaChevronLeft, FaTimes, FaTrash } from 'react-icons/fa';
 import Modal from '../../../components/Modal';
@@ -61,7 +61,7 @@ const Remove: React.FC = () => {
           <div>
             <div className="flex space-x-2 items-center p-4">
               <Avatar content={addressToRemove || ''} className="h-8 w-8" />
-              <AccountName address={addressToRemove} />
+              <CopiableText text={addressToRemove} />
             </div>
           </div>
           <div>
@@ -99,7 +99,7 @@ const Remove: React.FC = () => {
             <div className="flex w-full justify-between items-center">
               <div className="flex space-x-2 items-center p-4">
                 <Avatar content={address} className="h-8 w-8" />
-                <AccountName address={address} />
+                <CopiableText text={address} />
               </div>
               <div className="text-red-400">
                 <IconButton

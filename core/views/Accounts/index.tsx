@@ -51,7 +51,7 @@ const Accounts: React.FC = () => {
       <h1 className="font-bold text-center md:text-left text-3xl md:text-5xl py-4">
         Configure your <span className="blue">accounts</span>
       </h1>
-      <div className="flex-col w-full justify-center text-center">
+      <div className="flex-col w-full justify-center text-center md:py-8">
         <div className="flex-col w-full">
           <ActionCard
             icon={<FaPlusSquare />}

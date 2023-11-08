@@ -8,7 +8,7 @@ const Sidebar: React.FC<{ disabled: boolean }> = ({ disabled }) => {
   const { t } = useTranslation();
 
   return (
-    <aside className="fixed text-xs flex p-2 md:space-y-4 md:p-4 md:flex-col justify-around md:justify-start inset-x-0 bottom-0 md:sticky md:col-span-1 md:top-0 md:left-0 md:bottom-0 md:items-start transition-all">
+    <aside className="fixed text-xs flex p-2 md:p-4 md:flex-row justify-around inset-x-0 bottom-0 md:sticky transition-all">
       <SidebarLink
         IconComponent={FaCoins}
         name={t('components.Sidebar.Assets', 'Assets')}

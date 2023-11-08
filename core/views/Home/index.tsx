@@ -5,7 +5,7 @@ import Card from '../../components/Card';
 import { useAccount, AccountAssetInformation } from '../../utils/account';
 import Loader from '../../components/Loader';
 import { FaExclamationTriangle, FaKey, FaPlus } from 'react-icons/fa';
-import AccountName from '../../components/AccountName';
+import CopiableText from '../../components/CopiableText';
 import IconButton from '../../components/IconButton';
 import { Link } from 'react-router-dom';
 
@@ -49,8 +49,8 @@ const Home: React.FC = () => {
     <Loader />
   ) : (
     <div>
-      <div className="flex flex-col justify-center items-start space-y-8">
-        <div className="w-full max-w-screen-lg">
+      <div className="w-full flex-col justify-center space-y-8">
+        <div className="w-full">
           <AssetBar
             id={0}
             assets={assets}
@@ -77,20 +77,20 @@ const Home: React.FC = () => {
                     ' unimported account'}
                 </span>
                 <div>
-                  <AccountName address={account?.['auth-addr']} />
+                  <CopiableText text={account?.['auth-addr']} />
                 </div>
               </div>
             </div>
           )}
         </div>
+        <div className="flex w-full justify-center">
+          <Link to="opt">
+            <IconButton IconComponent={FaPlus} name="Add assets" />
+          </Link>
+        </div>
         {(account?.amount || 0) > 0 && (
           <>
-            <div className="flex w-full max-w-screen-lg flex-col space-y-2">
-              <div className="flex w-full items-center justify-end">
-                <Link to="opt">
-                  <IconButton IconComponent={FaPlus} name="Add assets" />
-                </Link>
-              </div>
+            <div className="w-full flex-col space-y-2 justify-center">
               {holdingAssets.length > 0 ? (
                 holdingAssets.map((a: any) => (
                   <AssetBar
@@ -101,11 +101,13 @@ const Home: React.FC = () => {
                   />
                 ))
               ) : (
-                <Card className="opacity-50">
-                  <div className="text-center w-full">
-                    No assets to be found here. Add some?
-                  </div>
-                </Card>
+                <div className="flex w-full justify-center">
+                  <Card className="opacity-50 md:w-1/3">
+                    <div className="text-center w-full">
+                      No assets to be found here. Add some?
+                    </div>
+                  </Card>
+                </div>
               )}
             </div>
             <div className="flex w-full max-w-screen-lg flex-col space-y-2">

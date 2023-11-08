@@ -13,7 +13,7 @@ import IconButton from '../../../components/IconButton';
 import wordlist from './wordlist';
 import { classNames } from '../../../utils/common';
 import algosdk from 'algosdk';
-import AccountName from '../../../components/AccountName';
+import CopiableText from '../../../components/CopiableText';
 import SmallButton from '../../../components/SmallButton';
 import toast from 'react-hot-toast';
 import { ActionTypes, useStore } from '../../../utils/store';
@@ -184,7 +184,7 @@ const Mnemonic: React.FC = () => {
                 </span>
               </div>
               <div className="flex justify-center p-2">
-                <AccountName address={account?.addr} />
+                <CopiableText text={account?.addr} />
               </div>
             </div>
           ) : (

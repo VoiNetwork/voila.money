@@ -9,9 +9,10 @@ interface AmountProps {
 
 const Amount: React.FC<AmountProps> = ({ amount, decimals, size, ticker }) => {
   function splitDecimals(amt: number): [string, string] {
-    const integerPart = Math.floor(amt / Math.pow(10, decimals));
-    const decimalPart = amt - integerPart * Math.pow(10, decimals);
-    return [integerPart.toString(), decimalPart.toString()];
+    const nonAtomicNumber = amt / Math.pow(10, decimals);
+    const number = nonAtomicNumber.toString().split(".");
+    const decimal = number.length < 2 ? "0" : number[1];
+    return [number[0], decimal];
   }
 
   const [integerPart, decimalPart] = useMemo(

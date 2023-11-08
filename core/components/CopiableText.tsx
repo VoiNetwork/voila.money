@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { classNames } from '../utils/common';
 import { FaCopy } from 'react-icons/fa';
 
-interface AccountNameProps {
-  address?: string;
+interface CopiableTextProps {
+  text?: string;
   full?: boolean;
+  showCopiedText?: boolean;
   className?: string;
 }
 
-const AccountName: React.FC<AccountNameProps> = ({
-  address,
+const CopiableText: React.FC<CopiableTextProps> = ({
+  text: address,
   full,
+  showCopiedText = true,
   className,
 }) => {
   const [copied, setCopied] = useState<boolean>(false);
@@ -35,28 +37,32 @@ const AccountName: React.FC<AccountNameProps> = ({
     >
       <div className="opacity-50 text-sm overflow-auto">
         {full ?
-            address
+          address
           :
-            `${address?.slice(0, 4)}` + "..." + `${address?.slice(address.length - 4, address.length)}`
+          `${address?.slice(0, 4)}` + "..." + `${address?.slice(address.length - 4, address.length)}`
         }
       </div>
-      <div
-        className={classNames(
-          'text-sm opacity-80 ',
-          copied && 'pointer-events-none'
-        )}
-      >
+      {showCopiedText ?
         <div
           className={classNames(
-            'text-xs pointer-events-none',
-            copied ? 'opacity-80' : 'opacity-0'
+            'text-sm opacity-80 ',
+            copied && 'pointer-events-none'
           )}
         >
-          Copied!
+          <div
+            className={classNames(
+              'text-xs pointer-events-none',
+              copied ? 'opacity-80' : 'opacity-0'
+            )}
+          >
+            Copied!
+          </div>
         </div>
-      </div>
+        :
+        null
+      }
     </div>
   );
 };
 
-export default AccountName;
+export default CopiableText;

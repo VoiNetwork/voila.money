@@ -21,7 +21,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
       to={to}
       className={({ isActive, isPending }) => {
         const baseClasses =
-          'flex md:flex-col md:space-y-2 items-center p-3 space-x-3 md:space-x-0 md:w-full md:justify-center rounded-lg shadow-md dark:shadow-gray-700 select-none';
+          'flex md:flex-col md:space-y-2 items-center p-3 space-x-3 md:space-x-0 md:w-1/6 rounded-lg shadow-md dark:shadow-gray-700 select-none';
         const activeClasses = 'bg-blue-500 dark:bg-blue-600 text-white';
         const inactiveClasses =
           'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 bg-white dark:bg-gray-800';

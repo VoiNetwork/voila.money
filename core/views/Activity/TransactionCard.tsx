@@ -4,9 +4,10 @@ import Amount from '../../components/Amount';
 import Card from '../../components/Card';
 import { classNames } from '../../utils/common';
 import { useStore } from '../../utils/store';
+import CopiableText from '../../components/CopiableText';
 
 interface TransactionCardProps {
-  id: number;
+  id: string;
   amount: number;
   assetId: number;
   transaction: AccountTransactionInformation;
@@ -14,7 +15,7 @@ interface TransactionCardProps {
 
 const TransactionCard: React.FC<TransactionCardProps> = ({ id, amount, assetId, transaction }) => {
   const { state } = useStore();
-  const [assetDecimal, setAssetDecimal] = useState(0);
+  const [assetDecimal, setAssetDecimal] = useState(6);
   const [assetUnitName, setAssetUnitName] = useState('');
   
     useEffect(() => {
@@ -60,7 +61,12 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ id, amount, assetId, 
         <div>
           <div className="text-base font-bold">{txType || 'Unknown'}</div>
           <div className="space-x-2 opacity-80 font-mono">
-            <span className="text-xs opacity-70">{id}</span>
+            <span className="text-xs opacity-70">
+              <CopiableText
+                text={id}
+                showCopiedText={false}
+              />
+            </span>
           </div>
         </div>
       </div>
@@ -71,7 +77,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ id, amount, assetId, 
         </div>
         <div className="flex items-end space-x-2 px-2">
           <span className="text-xs opacity-70">Fee</span>
-          <span className="text-xs opacity-70">{txFee} A</span>
+          <span className="text-xs opacity-70">{txFee} V</span>
         </div>
       </div>
     </Card>

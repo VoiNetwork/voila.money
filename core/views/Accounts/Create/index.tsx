@@ -1,7 +1,7 @@
 import algosdk from 'algosdk';
 import React, { useEffect, useState } from 'react';
 import Avatar from '../../../components/Avatar';
-import AccountName from '../../../components/AccountName';
+import CopiableText from '../../../components/CopiableText';
 import IconButton from '../../../components/IconButton';
 import { FaChevronLeft, FaRedo, FaSave } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
@@ -67,10 +67,10 @@ const Create: React.FC = () => {
         </div>
         <div className="flex flex-col justify-center">
           <div className="opacity-80">Public address:</div>
-          <AccountName full={false} address={account?.addr || ''} className="text-xl" />
+          <CopiableText full={false} text={account?.addr || ''} className="text-xl" />
           <div className="opacity-80">Mnemonic:</div>
           {account?.sk ?
-            <AccountName full={false} address={algosdk.secretKeyToMnemonic(account?.sk) || ''} className="text-xl" />
+            <CopiableText full={false} text={algosdk.secretKeyToMnemonic(account?.sk) || ''} className="text-xl" />
             :
             null
           }
