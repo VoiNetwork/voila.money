@@ -29,7 +29,7 @@ const IconButton: React.FC<IconButtonProps> = ({
       disabled={disabled}
       onClick={onClick}
       className={classNames(
-        'flex items-center rounded-lg shadow-md dark:shadow-gray-700 active:opacity-50',
+        'flex h-full items-center rounded-lg shadow-md dark:shadow-gray-700 active:opacity-50',
         small ? 'p-1 space-x-1' : 'space-x-2 p-3',
         disabled && 'disabled:cursor-not-allowed disabled:opacity-60',
         primary

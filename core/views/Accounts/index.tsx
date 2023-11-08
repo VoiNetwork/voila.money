@@ -73,7 +73,7 @@ const Accounts: React.FC = () => {
             description="Change the private key to a different account"
           />
         </div>
-        <div className="p-4 text-base md:text-lg text-center md:text-left text-gray-600 dark:text-gray-300">
+        <div className="p-4 text-base md:text-lg text-center text-gray-600 dark:text-gray-300">
           or
         </div>
         <div className="flex-col">

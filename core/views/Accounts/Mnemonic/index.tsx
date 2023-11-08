@@ -48,10 +48,10 @@ const Mnemonic: React.FC = () => {
   const checkValidMnemonic = (): algosdk.Account | undefined => {
     const cleanMnemonic = textMnemonic
       ? textMnemonic
-          .replaceAll(',', '')
-          .split(' ')
-          .map((w) => w.trim())
-          .join(' ')
+        .replaceAll(',', '')
+        .split(' ')
+        .map((w) => w.trim())
+        .join(' ')
       : mnemonic.join(' ');
     try {
       const account = algosdk.mnemonicToSecretKey(cleanMnemonic);
@@ -116,83 +116,71 @@ const Mnemonic: React.FC = () => {
         >
           or
         </div>
-        <div className="flex flex-col justify-center items-center space-y-3">
-          <div className="grid grid-cols-5 gap-x-4">
-            {new Array(5).fill(0).map((_, i) => (
-              <div className="flex flex-col space-y-2" key={5 * i + 1}>
-                {new Array(5).fill(0).map((_, j) => (
-                  <div className="flex space-x-2 items-center" key={5 * i + j + 1}>
-                    <span
-                      className={classNames(
-                        'text-xs font-bold  w-[24px] text-right',
-                        textMnemonic !== '' ? 'opacity-30' : 'opacity-80'
-                      )}
-                    >
-                      {5 * i + j + 1}
-                    </span>
-                    <input
-                      onFocus={() => setTypingField(5 * i + j)}
-                      onBlur={() => setTypingField(undefined)}
-                      onChange={updateMnemonicWord(5 * i + j)}
-                      type={
-                        showAll || typingField === 5 * i + j
-                          ? 'text'
-                          : 'password'
-                      }
-                      autoComplete="off"
-                      disabled={textMnemonic !== ''}
-                      value={mnemonic[5 * i + j]}
-                      className={classNames(
-                        'shadow rounded-lg bg-white dark:bg-gray-800 p-2 w-[100px]',
-                        mnemonic[5 * i + j] &&
-                          (isValidMnemonicWord(mnemonic[5 * i + j])
-                            ? 'ring ring-1 ring-green-400'
-                            : 'ring ring-2 ring-red-400 bg-red-100'),
-                        textMnemonic !== '' && 'opacity-50'
-                      )}
-                      placeholder={`Word #${5 * i + j + 1}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="flex space-x-2">
-            <SmallButton
-              disabled={textMnemonic !== ''}
-              IconComponent={FaBroom}
-              onClick={() => setMnemonic(new Array(25).fill(''))}
-            >
-              Clear
-            </SmallButton>
-            <SmallButton
-              disabled={textMnemonic !== ''}
-              IconComponent={showAll ? FaEyeSlash : FaEye}
-              onClick={() => setShowAll((v) => !v)}
-            >
-              {showAll ? 'Hide' : 'Show'}
-            </SmallButton>
-          </div>
-        </div>
-        {!(mnemonic.every((w) => w === '') && textMnemonic === '') &&
-          (account ? (
-            <div className="pt-4">
-              <div className="flex space-x-2 items-center text-opacity-80 text-green-600 font-bold">
-                <FaCheckCircle />
-                <span>
-                  Mnemonic is valid! You are about to add this account:
-                </span>
-              </div>
-              <div className="flex justify-center p-2">
-                <CopiableText text={account?.addr} />
-              </div>
-            </div>
-          ) : (
-            <div className="pt-4 flex space-x-2 items-center text-opacity-80 text-red-600 font-bold">
-              <FaTimesCircle />
-              <span>Your mnemonic is invalid or incomplete</span>
+        <div className="flex justify-center items-center w-full flex-wrap">
+          {new Array(25).fill(0).map((_, i) => (
+            <div className='p-2'>
+              <input
+                onFocus={() => setTypingField(i)}
+                onBlur={() => setTypingField(undefined)}
+                onChange={updateMnemonicWord(i)}
+                type={
+                  showAll || typingField === i
+                    ? 'text'
+                    : 'password'
+                }
+                autoComplete="off"
+                disabled={textMnemonic !== ''}
+                value={mnemonic[i]}
+                className={classNames(
+                  'shadow rounded-lg bg-white dark:bg-gray-800 p-2 w-[100px]',
+                  mnemonic[i] &&
+                  (isValidMnemonicWord(mnemonic[i])
+                    ? 'ring ring-1 ring-green-400'
+                    : 'ring ring-2 ring-red-400 bg-red-100'),
+                  textMnemonic !== '' && 'opacity-50'
+                )}
+                placeholder={`Word #${i + 1}`}
+              />
             </div>
           ))}
+        </div>
+        <div className="flex space-x-2">
+          <SmallButton
+            disabled={textMnemonic !== ''}
+            IconComponent={FaBroom}
+            onClick={() => setMnemonic(new Array(25).fill(''))}
+          >
+            Clear
+          </SmallButton>
+          <SmallButton
+            disabled={textMnemonic !== ''}
+            IconComponent={showAll ? FaEyeSlash : FaEye}
+            onClick={() => setShowAll((v) => !v)}
+          >
+            {showAll ? 'Hide' : 'Show'}
+          </SmallButton>
+        </div>
+        <div className='flex-col justify-center pt-4 flex space-y-2 space-x-2 items-center text-opacity-80 text-red-600 font-bold'>
+          {!(mnemonic.every((w) => w === '') && textMnemonic === '') &&
+            (account ? (
+              <>
+                <FaCheckCircle />
+                <div className="flex space-x-2 items-center text-opacity-80 text-green-600 font-bold">
+                  <span>
+                    Mnemonic is valid! You are about to add this account:
+                  </span>
+                </div>
+                <div className="flex justify-center p-2">
+                  <CopiableText text={account?.addr} />
+                </div>
+              </>
+            ) : (
+              <>
+                <FaTimesCircle />
+                <span>Your mnemonic is invalid or incomplete</span>
+              </>
+            ))}
+        </div>
         <div className="p-4 flex space-x-4">
           <Link to={'/accounts'}>
             <IconButton IconComponent={FaChevronLeft} name="Cancel">
@@ -210,7 +198,7 @@ const Mnemonic: React.FC = () => {
           </IconButton>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
