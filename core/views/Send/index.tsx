@@ -7,6 +7,7 @@ import {
   FaPaperPlane,
   FaTimes,
   FaUser,
+  FaPencilAlt
 } from 'react-icons/fa';
 import IconButton from '../../components/IconButton';
 import { Link, useParams } from 'react-router-dom';
@@ -28,6 +29,7 @@ const Send: React.FC = () => {
   const [waitingResponse, setWaitingResponse] = useState(false);
   const [amount, setAmount] = useState('');
   const [receiver, setReceiver] = useState('');
+  const [note, setNote] = useState('');
   const [txId, setTxId] = useState(null);
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [transactionFailed, setTransactionFailed] = useState(false);
@@ -103,7 +105,7 @@ const Send: React.FC = () => {
           txnParams: {
             from: account.address,
             to: receiver,
-            note: 'Voila!',
+            note: note !== '' ? note : "Voila!",
             amount: amountToSend.toString(),
           },
           network: state.network
@@ -265,6 +267,14 @@ const Send: React.FC = () => {
                 value={receiver}
                 onChange={setReceiver}
                 icon={<FaUser />}
+              />
+            </div>
+            <div>
+              <Input
+                placeholder={'Note'}
+                value={note}
+                onChange={setNote}
+                icon={<FaPencilAlt />}
               />
             </div>
           </div>
