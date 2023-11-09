@@ -79,28 +79,28 @@ const Send: React.FC = () => {
   const send = async () => {
     try {
       if (account?.address) {
-        const suggestedParams = await state.node.getTransactionParams().do();
-        const ptxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-          from: account.address,
-          suggestedParams,
-          to: receiver,
-          amount: asset.amount,
-          note: new Uint8Array(Buffer.from('Voila!')),
-        });
         console.log("send account.address", account.address)
-        let txns = [
-          ptxn
-        ];
-        let txgroup = algosdk.assignGroupID(txns);
+        const request: any = {
+          address: account.address,
+          txnParams: {
+            from: account.address,
+            to: receiver,
+            note: 'Voila!',
+            amount: amount,
+          },
+          network: state.network
+        };
+
+        if ('asset-id' in asset) {
+          request.txnParams.type = 'axfer';
+          request.txnParams.assetIndex = asset['asset-id'];
+        } else {
+          request.txnParams.type = 'pay';
+        }
         let response = await storage.signTransactions(
-          [txgroup],
-          account.address
+          request
         );
         console.log("response", response)
-        let decodedResponse = Buffer.from(response[0][0].blob).toString('base64');
-        console.log(JSON.stringify(response[0][0].txID));
-        console.log(JSON.stringify(decodedResponse));
-        // toast.success(response[0][0]["txID"]);
       }
     } catch (exception) {
       console.error(exception)

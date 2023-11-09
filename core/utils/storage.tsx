@@ -171,10 +171,9 @@ export class SecureStorage {
     });
   }
 
-  async signTransactions(groups: algosdk.TransactionLike[][], address: string): Promise<{ txID: string; blob: Uint8Array; }[][]> {
-    console.log("signTransactions - address", address);
+  async signTransactions(request: any): Promise<Uint8Array> {
     return await this.handleMessage(SecureMessageTypes.signTransactions, {
-      groups, address
+      request
     });
   }
 

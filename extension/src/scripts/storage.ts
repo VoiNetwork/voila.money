@@ -1,9 +1,12 @@
 import CryptoJS from 'crypto-js';
 import browser from 'webextension-polyfill';
 import { CryptoStorage } from './webcrypto/storage';
-import algosdk from 'algosdk';
+import algosdk, { Transaction } from 'algosdk';
 import { STORAGE_TIMEOUT_SECONDS } from '../../../core/utils/storage';
 import { Buffer } from 'buffer';
+import { base64ToByteArray } from '../../../core/utils/common';
+import { Network, getNodeClient } from '../../../core/utils/network';
+import AnyTransaction from 'algosdk/dist/types/types/transactions';
 
 let storage: CryptoStorage | null = null;
 let storageExpiry: ReturnType<typeof setTimeout>;
@@ -254,15 +257,59 @@ export async function importBackup(data: {
   }
 }
 
-export async function signTransactions(data: {
-  groups: algosdk.TransactionLike[][];
-  address: string;
-}): Promise<{ txID: string; blob: Uint8Array }[][]> {
-  const sk = await get<Uint8Array>(data.address);
+export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<string> {
+  const { network, address, txnParams } = data.request;
+  const algod = getNodeClient(network);
+  const params = await algod.getTransactionParams().do();
+  const txn = {
+    ...txnParams,
+    amount: BigInt(txnParams.amount),
+    fee: params.fee,
+    firstRound: params.firstRound,
+    lastRound: params.lastRound,
+    genesisID: params.genesisID,
+    genesisHash: params.genesisHash,
+  };
+  if ('note' in txn) txn.note = new Uint8Array(Buffer.from(txn.note));
+  const sk = await get<Uint8Array>(address) as Uint8Array;
   if (!sk) {
     throw new Error('Account not found.');
   }
-  return data.groups.map((group) => {
-    return group.map((txn) => algosdk.signTransaction(txn, sk));
-  });
+
+  let skInstance = sk instanceof Uint8Array;
+  console.log(skInstance)
+
+  let keyArray= []
+  for (const [key, value] of Object.entries(sk)) {
+    keyArray.push(value);
+  }
+  const uintSK = new Uint8Array(keyArray)
+  console.log(uintSK)
+
+  let signedTxn;
+  const builtTx = buildTransaction(txn);
+  signedTxn = {
+    txID: builtTx.txID().toString(),
+    blob: builtTx.signTxn(uintSK),
+  };
+  const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
+  return txId;
+
+  // return data.groups.map((group) => {
+  //   return group.map((txn) => {
+  //     const rawTx: Transaction = algosdk.decodeUnsignedTransaction(
+  //       base64ToByteArray(txn)
+  //     );
+  //     algosdk.instantiateTxnIfNeeded(txn).signTxn(sk)
+  //   });
+  // });
+}
+
+export function buildTransaction(txn: any): Transaction {
+  const builtTxn = new Transaction(txn as AnyTransaction);
+  if (txn['group']) {
+    // Remap group field lost from cast
+    builtTxn.group = Buffer.from(txn['group'], 'base64');
+  }
+  return builtTxn;
 }
