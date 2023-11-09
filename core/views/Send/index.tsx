@@ -156,11 +156,9 @@ const Send: React.FC = () => {
               </>
               :
               <>
-                <Link to={'/'}>
-                  <IconButton IconComponent={FaTimes} name="Cancel">
-                    <span>Cancel</span>
-                  </IconButton>
-                </Link>
+                <IconButton IconComponent={FaTimes} name="Cancel" onClick={confirmationModalClose}>
+                  <span>Cancel</span>
+                </IconButton>
                 <IconButton
                   IconComponent={FaPaperPlane}
                   name="Send"
