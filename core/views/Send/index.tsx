@@ -18,15 +18,19 @@ import { classNames } from '../../utils/common';
 import assetPlaceholder from '../../assets/asset.png';
 import Amount from '../../components/Amount';
 import { useSecureStorage } from '../../utils/storage';
-import algosdk from 'algosdk';
 import toast from 'react-hot-toast';
-import { Buffer } from 'buffer';
+import CopiableText from '../../components/CopiableText';
 
 const Send: React.FC = () => {
   const { account, assets } = useAccount();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [waitingResponse, setWaitingResponse] = useState(false);
   const [amount, setAmount] = useState('');
   const [receiver, setReceiver] = useState('');
+  const [txId, setTxId] = useState(null);
+  const [transactionSuccess, setTransactionSuccess] = useState(false);
+  const [transactionFailed, setTransactionFailed] = useState(false);
   const { state } = useStore();
   const { id } = useParams();
   const storage = useSecureStorage();
@@ -74,23 +78,36 @@ const Send: React.FC = () => {
     };
   }, [account, assets, state.network, id]);
 
-  const closeModal = () => setModalOpen(false);
+  const confirmationModalClose = () => setConfirmationModalOpen(false);
+  const transactionModalClose = () => setTransactionModalOpen(false);
 
   const send = async () => {
+    setWaitingResponse(true);
+    setTransactionSuccess(false);
+    setTransactionFailed(false);
+    setTxId(null);
     try {
       if (account?.address) {
         console.log("send account.address", account.address)
+
+        const decimals = 'decimals' in asset ? asset.decimals : 6;
+        const amountArray = amount.split('.');
+        const decimalsOnTheInput = amountArray.length > 1;
+        let amountToSend = BigInt(amountArray[0]) * BigInt(Math.pow(10, decimals));
+        if (decimalsOnTheInput) {
+          amountToSend +=
+            BigInt(amountArray[1]) * BigInt(Math.pow(10, decimals - amountArray[1].length));
+        }
         const request: any = {
           address: account.address,
           txnParams: {
             from: account.address,
             to: receiver,
             note: 'Voila!',
-            amount: amount,
+            amount: amountToSend.toString(),
           },
           network: state.network
         };
-
         if ('asset-id' in asset) {
           request.txnParams.type = 'axfer';
           request.txnParams.assetIndex = asset['asset-id'];
@@ -101,31 +118,77 @@ const Send: React.FC = () => {
           request
         );
         console.log("response", response)
+        if ('error' in response) {
+          toast.error("Error");
+          setTransactionFailed(true);
+        } else {
+          setTxId(response.txId);
+          setTransactionSuccess(true);
+          toast.success("Success");
+        }
       }
     } catch (exception) {
       console.error(exception)
+      toast.error("Error");
+      setTransactionFailed(true);
     }
-    closeModal();
+    setWaitingResponse(false);
+    confirmationModalClose();
+    setTransactionModalOpen(true);
   };
 
   return (
     <>
-      <Modal open={modalOpen} onClose={closeModal}>
+      <Modal open={confirmationModalOpen} onClose={confirmationModalClose}>
         <Card className="flex w-full items-center justify-center flex-col space-y-8">
-          You are about to send
+          {waitingResponse ?
+            `Waiting for transaction confirmation`
+            :
+            `You are about to send`
+          }
           <div className="p-4 flex space-x-4">
-            <Link to={'/'}>
-              <IconButton IconComponent={FaTimes} name="Cancel">
-                <span>Cancel</span>
-              </IconButton>
-            </Link>
+            {waitingResponse ?
+              <>
+                <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-blue-600" />
+              </>
+              :
+              <>
+                <Link to={'/'}>
+                  <IconButton IconComponent={FaTimes} name="Cancel">
+                    <span>Cancel</span>
+                  </IconButton>
+                </Link>
+                <IconButton
+                  IconComponent={FaPaperPlane}
+                  name="Send"
+                  onClick={send}
+                  primary
+                  disabled={waitingResponse}
+                >
+                  <span>Send</span>
+                </IconButton>
+              </>
+            }
+          </div>
+        </Card>
+      </Modal>
+      <Modal open={transactionModalOpen} onClose={transactionModalClose}>
+        <Card className="flex w-full items-center justify-center flex-col space-y-8">
+          {transactionSuccess ?
+            `Transaction Successful`
+            :
+            transactionFailed ? `Transaction Failed` : `Transaction Unknown`
+          }
+          <div className='pt-6'>
+            {transactionSuccess && txId ? <CopiableText text={txId} full={false} showCopiedText={false} /> : null}
+          </div>
+          <div className="p-4 flex space-x-4">
             <IconButton
-              IconComponent={FaPaperPlane}
-              name="Send"
-              onClick={send}
+              IconComponent={FaCheck}
+              name="Ok"
+              onClick={() => transactionModalClose()}
               primary
             >
-              <span>Send</span>
             </IconButton>
           </div>
         </Card>
@@ -212,7 +275,7 @@ const Send: React.FC = () => {
             <IconButton
               IconComponent={FaCheck}
               name="Confirm"
-              onClick={() => setModalOpen(true)}
+              onClick={() => setConfirmationModalOpen(true)}
               primary
             >
               <span>Confirm</span>

@@ -171,7 +171,7 @@ export class SecureStorage {
     });
   }
 
-  async signTransactions(request: any): Promise<Uint8Array> {
+  async signTransactions(request: any): Promise<any> {
     return await this.handleMessage(SecureMessageTypes.signTransactions, {
       request
     });

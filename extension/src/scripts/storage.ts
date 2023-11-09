@@ -71,7 +71,7 @@ async function get<T>(name: string): Promise<T | null> {
     updateStorageTimeout();
     const data = await storage.get(name);
     if (data) {
-      return JSON.parse(data);
+      return JSON.parse(data) as T;
     }
     return null;
   } else {
@@ -257,7 +257,7 @@ export async function importBackup(data: {
   }
 }
 
-export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<string> {
+export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<object> {
   const { network, address, txnParams } = data.request;
   const algod = getNodeClient(network);
   const params = await algod.getTransactionParams().do();
@@ -275,17 +275,11 @@ export async function signTransactions(data: { request: { address: string, netwo
   if (!sk) {
     throw new Error('Account not found.');
   }
-
-  let skInstance = sk instanceof Uint8Array;
-  console.log(skInstance)
-
-  let keyArray= []
+  let keyArray = []
   for (const [key, value] of Object.entries(sk)) {
     keyArray.push(value);
   }
   const uintSK = new Uint8Array(keyArray)
-  console.log(uintSK)
-
   let signedTxn;
   const builtTx = buildTransaction(txn);
   signedTxn = {
@@ -293,7 +287,7 @@ export async function signTransactions(data: { request: { address: string, netwo
     blob: builtTx.signTxn(uintSK),
   };
   const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
-  return txId;
+  return { txId: txId };
 
   // return data.groups.map((group) => {
   //   return group.map((txn) => {

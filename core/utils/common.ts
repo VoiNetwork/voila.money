@@ -20,3 +20,22 @@ export function stringToByteArray(str: string): Uint8Array {
 export function byteArrayToString(array: any): string {
   return String.fromCharCode.apply(null, array);
 }
+
+function serializeWithTypeInfo(object: object) {
+  return JSON.stringify({
+    type: object.constructor.name,
+    data: object,
+  });
+}
+
+// Deserialize with type information
+function deserializeWithTypeInfo(json: string) {
+  const wrapper = JSON.parse(json);
+  switch (wrapper.type) {
+    case 'Transaction':
+      // return recreateTransactionInstance(wrapper.data);
+    // Handle other types...
+    default:
+      throw new Error('Unknown type');
+  }
+}
