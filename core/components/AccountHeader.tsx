@@ -33,7 +33,7 @@ const AccountHeader: React.FC<{ showAccountDropDown: boolean }> = ({ showAccount
     <div className="flex w-full justify-center md:h-1/3 shadow-sm">
       <div className="max-w-screen-2xl flex flex-col w-full justify-center items-center">
         <div className="flex flex-col items-center justify-center">
-          {showAccountDropDown &&
+          {(state.display !== 'extension' || showAccountDropDown)  &&
             <div className="flex items-center space-x-4 h-[80px]">
               <div>
                 <IconButton
