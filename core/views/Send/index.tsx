@@ -135,6 +135,8 @@ const Send: React.FC = () => {
     setWaitingResponse(false);
     confirmationModalClose();
     setTransactionModalOpen(true);
+    setAmount('');
+    setReceiver('')
   };
 
   return (
