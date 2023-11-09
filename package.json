@@ -21,7 +21,7 @@
     "extract-translations": "npx i18next-parser -c i18next-parser.config.js"
   },
   "dependencies": {
-    "algosdk": "^2.2.0",
+    "algosdk": "^2.7.0",
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.7",
