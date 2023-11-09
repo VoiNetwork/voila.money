@@ -19,7 +19,7 @@ const Sidebar: React.FC<{ disabled: boolean }> = ({ disabled }) => {
         IconComponent={FaImages}
         name={t('components.Sidebar.NFTs', 'NFTs')}
         to="/nfts"
-        disabled={disabled}
+        disabled={true}
       />
       <SidebarLink
         IconComponent={FaSearch}
