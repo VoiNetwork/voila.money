@@ -288,18 +288,9 @@ export async function signTransactions(data: { request: { address: string, netwo
   };
   const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
   return { txId: txId };
-
-  // return data.groups.map((group) => {
-  //   return group.map((txn) => {
-  //     const rawTx: Transaction = algosdk.decodeUnsignedTransaction(
-  //       base64ToByteArray(txn)
-  //     );
-  //     algosdk.instantiateTxnIfNeeded(txn).signTxn(sk)
-  //   });
-  // });
 }
 
-export function buildTransaction(txn: any): Transaction {
+function buildTransaction(txn: any): Transaction {
   const builtTxn = new Transaction(txn as AnyTransaction);
   if (txn['group']) {
     // Remap group field lost from cast

@@ -119,7 +119,6 @@ const Send: React.FC = () => {
         let response = await storage.signTransactions(
           request
         );
-        console.log("response", response)
         if ('error' in response) {
           toast.error("Error");
           setTransactionFailed(true);
