@@ -20,7 +20,7 @@ const NetworkSettings: React.FC = () => {
             'shadow-lg rounded-full text-white',
             !nw.isMainnet && 'bg-orange-500 dark:bg-orange-600 p-1'
           )}
-          style={{ height: '1.2rem', width: '1.2rem' }}
+          style={{ height: '1.25rem', width: '1.25rem' }}
         />
       </div>
     );

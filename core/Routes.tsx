@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import Navbar from './components/Navbar';
 import { HashRouter, Routes as BrowserRoutes, Route } from 'react-router-dom';
 import Home from './views/Home';
@@ -21,6 +21,9 @@ import Opt from './views/Opt';
 
 const Routes: FC = () => {
   const { state } = useStore();
+  const [showAccountDropDown, setShowAccountDropDown] = useState(false);
+
+  console.log(showAccountDropDown);
 
   return (
     <HashRouter>
@@ -35,8 +38,8 @@ const Routes: FC = () => {
           maxWidth: state.display === 'extension' ? '360px' : '100vw',
         }}
       >
-        <Navbar />
-        {state.addresses.length > 0 && <AccountHeader />}
+        <Navbar toggleShowAccountDropDown={() => setShowAccountDropDown(!showAccountDropDown)} />
+        {state.addresses.length > 0 && <AccountHeader showAccountDropDown={showAccountDropDown} />}
         {state.signedIn ? (
           <div className="h-full w-full overflow-y-auto flex-col text-sm">
             <Sidebar disabled={state.addresses.length === 0} />
