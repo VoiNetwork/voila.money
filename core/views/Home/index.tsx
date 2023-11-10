@@ -2,12 +2,13 @@ import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useStore } from '../../utils/store';
 import AssetBar from './AssetBar';
 import Card from '../../components/Card';
-import { useAccount, AccountAssetInformation } from '../../utils/account';
+import { useAccount } from '../../utils/account';
 import Loader from '../../components/Loader';
 import { FaExclamationTriangle, FaKey, FaPlus } from 'react-icons/fa';
 import CopiableText from '../../components/CopiableText';
 import IconButton from '../../components/IconButton';
 import { Link } from 'react-router-dom';
+import { AccountAssetInformation } from '../../../common/types';
 
 const Home: React.FC = () => {
   const { state } = useStore();

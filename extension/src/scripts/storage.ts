@@ -4,9 +4,14 @@ import { CryptoStorage } from './webcrypto/storage';
 import algosdk, { Transaction } from 'algosdk';
 import { STORAGE_TIMEOUT_SECONDS } from '../../../core/utils/storage';
 import { Buffer } from 'buffer';
-import { base64ToByteArray } from '../../../core/utils/common';
-import { Network, getNodeClient } from '../../../core/utils/network';
+import { getNodeClient } from '../../../core/utils/network';
+import { Network } from '../../../common/types'
 import AnyTransaction from 'algosdk/dist/types/types/transactions';
+import { BaseValidatedTxnWrap } from '../transaction/baseValidatedTxnWrap';
+import logging from '../../../common/logging';
+import { ValidationStatus } from '../utils/validator';
+import { getValidatedTxnWrap } from '../transaction/actions'
+import { buildTransaction } from '../utils/transactionBuilder'
 
 let storage: CryptoStorage | null = null;
 let storageExpiry: ReturnType<typeof setTimeout>;
@@ -66,7 +71,7 @@ async function remove(name: string): Promise<void> {
   }
 }
 
-async function get<T>(name: string): Promise<T | null> {
+export async function get<T>(name: string): Promise<T | null> {
   if (storage) {
     updateStorageTimeout();
     const data = await storage.get(name);
@@ -255,46 +260,4 @@ export async function importBackup(data: {
   } catch (e) {
     throw new Error((e as Error)?.message?.toString() || 'Invalid password');
   }
-}
-
-export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<object> {
-  const { network, address, txnParams } = data.request;
-  const algod = getNodeClient(network);
-  const params = await algod.getTransactionParams().do();
-  const txn = {
-    ...txnParams,
-    amount: BigInt(txnParams.amount),
-    fee: params.fee,
-    firstRound: params.firstRound,
-    lastRound: params.lastRound,
-    genesisID: params.genesisID,
-    genesisHash: params.genesisHash,
-  };
-  if ('note' in txn) txn.note = new Uint8Array(Buffer.from(txn.note));
-  const sk = await get<Uint8Array>(address) as Uint8Array;
-  if (!sk) {
-    throw new Error('Account not found.');
-  }
-  let keyArray = []
-  for (const [key, value] of Object.entries(sk)) {
-    keyArray.push(value);
-  }
-  const uintSK = new Uint8Array(keyArray)
-  let signedTxn;
-  const builtTx = buildTransaction(txn);
-  signedTxn = {
-    txID: builtTx.txID().toString(),
-    blob: builtTx.signTxn(uintSK),
-  };
-  const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
-  return { txId: txId };
-}
-
-function buildTransaction(txn: any): Transaction {
-  const builtTxn = new Transaction(txn as AnyTransaction);
-  if (txn['group']) {
-    // Remap group field lost from cast
-    builtTxn.group = Buffer.from(txn['group'], 'base64');
-  }
-  return builtTxn;
 }

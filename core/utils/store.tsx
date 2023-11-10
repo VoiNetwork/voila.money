@@ -1,7 +1,8 @@
 import React, { createContext, useReducer, useContext } from 'react';
+import { Network } from '../../common/types'
+
 import {
   NETWORKS,
-  Network,
   getIndexerClient,
   getNetwork,
   getNodeClient,
@@ -72,7 +73,7 @@ const StoreContext = createContext<{
   dispatch: (type: string, payload?: any) => void;
 }>({
   state: initialState,
-  dispatch: () => {},
+  dispatch: () => { },
 });
 
 interface StoreProviderProps {

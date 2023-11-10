@@ -13,8 +13,9 @@ import {
   setPrimaryAddress,
   lock,
   refresh,
-  signTransactions,
 } from './storage';
+
+import { signTransactions } from './internalMethods'
 
 const SecureMessageListenerFunctionMap: Record<
   (typeof SecureMessageTypes)[keyof typeof SecureMessageTypes],
@@ -30,9 +31,9 @@ const SecureMessageListenerFunctionMap: Record<
   [SecureMessageTypes.removeAccount]: removeAccount,
   [SecureMessageTypes.createBackup]: createBackup,
   [SecureMessageTypes.importBackup]: importBackup,
-  [SecureMessageTypes.signTransactions]: signTransactions,
   [SecureMessageTypes.lock]: lock,
   [SecureMessageTypes.refresh]: refresh,
+  [SecureMessageTypes.signTransactions]: signTransactions,
 };
 
 browser.runtime.onMessage.addListener(

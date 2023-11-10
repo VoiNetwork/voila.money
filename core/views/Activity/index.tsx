@@ -1,5 +1,5 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { useAccount, AccountTransactionInformation } from '../../utils/account';
+import React, { useState } from 'react';
+import { useAccount } from '../../utils/account';
 import TransactionCard from './TransactionCard';
 
 const Activity: React.FC = () => {

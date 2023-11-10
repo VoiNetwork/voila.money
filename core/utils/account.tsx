@@ -9,242 +9,7 @@ import React, {
 import { useStore } from './store';
 import { toast } from 'react-hot-toast';
 import { useLocalState } from '../hooks/useLocalState';
-
-export interface AccountAssetInformation {
-  amount: number;
-  'asset-id': number;
-  'is-frozen': boolean;
-}
-
-export interface AccountTransactionInformation {
-  'application-config-index': number;
-  'application-transaction': {
-     accounts: [];
-    'application-args': [];
-    'application-id': number;
-    'application-revision': number;
-    'foreign-assets': [];
-    'global-state-schema': {
-      'num-byte-slice': number;
-      'num-uint': number;
-    };
-    'local-state-schema': {
-      'num-byte-slice': number;
-      'num-uint': number;
-    };
-    'on-completion': string;
-  }[];
-  'asset-transfer-transaction': {
-    'amount': number;
-    'asset-decimals': number;
-    'asset-id': number;
-    'asset-name': string;
-    'asset-unit-name': string;
-    'close-acc-rewards': number;
-    'close-amount': number;
-    'close-asset-balance': number;
-    'close-balance': number;
-    'opt-in': boolean;
-    'receiver': string;
-    'receiver-acc-rewards': number;
-    'receiver-asset-balance': number;
-    'receiver-balance': number;
-    'receiver-tx-counter': number;
-    'sender-asset-balance': number;
-  }[];
-  'application-tx-counter': number;
-  'block-rewards-level': number;
-  'close-rewards': number;
-  'closing-amount': number;
-  'confirmed-round': number;
-  'fee': number;
-  'first-valid': number;
-  'id': string;
-  'index': number;
-  'inner-tx-offset': number;
-  'inner-txns': {
-    'asset-transfer-transaction': {
-      'amount': number;
-      'asset-decimals': number;
-      'asset-id': number;
-      'asset-name': string;
-      'asset-unit-name': string;
-      'close-acc-rewards': number;
-      'close-amount': number;
-      'close-asset-balance': number;
-      'close-balance': number;
-      'opt-in': boolean;
-      'receiver': string;
-      'receiver-acc-rewards': number;
-      'receiver-asset-balance': number;
-      'receiver-balance': number;
-      'receiver-tx-counter': number;
-      'sender-asset-balance': number;
-    }[];
-    'asset-tx-counter': number;
-    'block-rewards-level': number;
-    'close-rewards': number;
-    'closing-amount': number;
-    'confirmed-round': number;
-    'fee': number;
-    'first-valid': number;
-    'index': number;
-    'inner-tx-offset': number;
-    'intra-round-offset': number;
-    'last-valid': number;
-    'logs': [];
-    'parent-tx-offset': number;
-    'receiver-rewards': number;
-    'round-time': number;
-    'sender': string;
-    'sender-acc-rewards': number;
-    'sender-balance': number;
-    'sender-rewards': number;
-    'sender-tx-counter': number;
-    'tx-type': string;
-  }[];
-  'intra-round-offset': number;
-  'last-valid': number;
-  'logs': [];
-  'receiver-rewards': number;
-  'round-time': number;
-  'sender': string;
-  'sender-acc-rewards': number;
-  'sender-balance': number;
-  'sender-rewards': number;
-  'sender-tx-counter': number;
-  'signature': {
-    'sig': string;
-  }[];
-  'tx-type': string;
-}
-
-export interface AccountInformation {
-  address: string;
-  amount: number;
-  'min-balance': number;
-  'amount-without-pending-rewards': number;
-  'apps-local-state': {
-    id: number;
-    schema: {
-      'num-uint': number;
-      'num-byte-slice': number;
-    };
-    'key-value': [
-      {
-        key: string;
-        value: {
-          type: number;
-          bytes: string;
-          uint: number;
-        };
-      }
-    ];
-  }[];
-  'total-apps-opted-in': number;
-  'apps-total-schema': {
-    'num-uint': number;
-    'num-byte-slice': number;
-  };
-  'apps-total-extra-pages': number;
-  assets: AccountAssetInformation[];
-  transactions: AccountTransactionInformation[];
-  'total-assets-opted-in': number;
-  'created-apps': {
-    id: number;
-    params: {
-      creator: string;
-      'approval-program': string;
-      'clear-state-program': string;
-      'extra-program-pages': number;
-      'local-state-schema': {
-        'num-uint': number;
-        'num-byte-slice': number;
-      };
-      'global-state-schema': {
-        'num-uint': number;
-        'num-byte-slice': number;
-      };
-      'global-state': [
-        {
-          key: string;
-          value: {
-            type: number;
-            bytes: string;
-            uint: number;
-          };
-        }
-      ];
-    };
-  }[];
-  'total-created-apps': number;
-  'created-assets': {
-    index: number;
-    params: {
-      clawback: string;
-      creator: string;
-      decimals: number;
-      'default-frozen': true;
-      freeze: string;
-      manager: string;
-      'metadata-hash': string;
-      name: string;
-      'name-b64': string;
-      reserve: string;
-      total: number;
-      'unit-name': string;
-      'unit-name-b64': string;
-      url: string;
-      'url-b64': string;
-    };
-  }[];
-  'total-created-assets': number;
-  participation: {
-    'selection-participation-key': string;
-    'vote-first-valid': number;
-    'vote-key-dilution': number;
-    'vote-last-valid': number;
-    'vote-participation-key': string;
-    'state-proof-key': string;
-  };
-  'pending-rewards': number;
-  'reward-base': number;
-  rewards: number;
-  round: number;
-  status: string;
-  'sig-type': string;
-  'auth-addr': string;
-}
-
-export interface AssetParams {
-  clawback: string;
-  creator: string;
-  decimals: number;
-  'default-frozen': true;
-  freeze: string;
-  manager: string;
-  'metadata-hash': string;
-  name: string;
-  'name-b64': string;
-  reserve: string;
-  total: number;
-  'unit-name': string;
-  'unit-name-b64': string;
-  url: string;
-  'url-b64': string;
-}
-
-export interface AssetInformation {
-  index: number;
-  params: AssetParams;
-}
-
-
-export interface TransactionInformation {
-  'current-round': number;
-  'next-token': string;
-  transactions: AccountTransactionInformation[];
-}
+import { AccountInformation, AccountTransactionInformation, AssetInformation, AssetParams, TransactionInformation } from '../../common/types';
 
 interface AccountProviderProps {
   children: JSX.Element | JSX.Element[];
@@ -288,12 +53,12 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
           ...chunk.map(
             (a) =>
               new Promise(async (resolve) => {
-                 await state.indexer
-                .searchForTransactions()
-                .address(account.address)
-                .do()
-                .then(resolve)
-                .catch(() => resolve(null));
+                await state.indexer
+                  .searchForTransactions()
+                  .address(account.address)
+                  .do()
+                  .then(resolve)
+                  .catch(() => resolve(null));
               })
           ),
         ])) as (TransactionInformation | null)[];
@@ -361,23 +126,23 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
 
         const networkId = state.network.id;
         const updates: (TransactionInformation | null)[] = (await Promise.all([
-              new Promise(async (resolve) => {
-                await state.indexer
-                .searchForTransactions()
-                .address(account.address)
-                .do()
-                .then(resolve)
-                .catch(() => resolve(null));
-              })
+          new Promise(async (resolve) => {
+            await state.indexer
+              .searchForTransactions()
+              .address(account.address)
+              .do()
+              .then(resolve)
+              .catch(() => resolve(null));
+          })
         ])) as (TransactionInformation | null)[];
         setTransactions((a) => {
-            const newTransactions = { ...a };
-            if (!newTransactions[networkId]) newTransactions[networkId] = {};
-            updates.forEach((u) => {
-              if (u !== null) newTransactions[networkId][0] = u.transactions;
-            });
-            return newTransactions;
+          const newTransactions = { ...a };
+          if (!newTransactions[networkId]) newTransactions[networkId] = {};
+          updates.forEach((u) => {
+            if (u !== null) newTransactions[networkId][0] = u.transactions;
           });
+          return newTransactions;
+        });
 
         if (thisFlag === flagRef.current) {
           setAccount(account as AccountInformation);
