@@ -39,7 +39,8 @@
     "react-i18next": "^12.2.2",
     "react-icons": "^4.8.0",
     "react-router-dom": "^6.9.0",
-    "webextension-polyfill": "^0.10.0"
+    "webextension-polyfill": "^0.10.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",

@@ -1,0 +1,36 @@
+{
+    "name": "ARC-200",
+    "desc": "Smart Contract Token Nonstandard Interface",
+    "methods": [
+      {
+        "name": "hasBalance",
+        "desc": "Transfers tokens from source to destination as approved spender",
+        "readonly": true,
+        "args": [
+          {
+            "type": "address",
+            "name": "addr",
+            "desc": "The source  of the transfer"
+          }
+        ],
+        "returns": { "type": "byte", "desc": "Success" }
+      },
+      {
+        "name": "hasAllowance",
+        "desc": "Transfers tokens from source to destination as approved spender",
+        "readonly": true,
+        "args": [
+          { "type": "address", "name": "owner" },
+          { "type": "address", "name": "spender" }
+        ],
+        "returns": { "type": "byte", "desc": "Success" }
+      },
+      {
+        "name": "touch",
+        "desc": "Transfers tokens from source to destination as approved spender",
+        "args": [],
+        "returns": { "type": "void" }
+      } 
+    ],
+    "events": []
+  }

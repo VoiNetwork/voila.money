@@ -18,6 +18,7 @@ interface State {
   node: algosdk.Algodv2;
   indexer: algosdk.Indexer;
   savedRequest: any;
+  arc200AppIds: string[];
 }
 
 export interface Action {
@@ -32,7 +33,8 @@ const initialState: State = {
   addresses: [],
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
-  savedRequest: undefined
+  savedRequest: undefined,
+  arc200AppIds: ['']
 };
 
 export const ActionTypes = {
