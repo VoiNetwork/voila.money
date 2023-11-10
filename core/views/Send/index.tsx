@@ -7,24 +7,34 @@ import {
   FaPaperPlane,
   FaTimes,
   FaUser,
+  FaPencilAlt
 } from 'react-icons/fa';
 import IconButton from '../../components/IconButton';
 import { Link, useParams } from 'react-router-dom';
 import { useAccount } from '../../utils/account';
-import Modal from '../../components/Modal';
-import Card from '../../components/Card';
 import { useStore } from '../../utils/store';
 import { classNames } from '../../utils/common';
 import assetPlaceholder from '../../assets/asset.png';
 import Amount from '../../components/Amount';
+import { useSecureStorage } from '../../utils/storage';
+import toast from 'react-hot-toast';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import TransactionModal from '../../components/TransactionModal';
 
 const Send: React.FC = () => {
   const { account, assets } = useAccount();
-  const [modalOpen, setModalOpen] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [waitingResponse, setWaitingResponse] = useState(false);
   const [amount, setAmount] = useState('');
   const [receiver, setReceiver] = useState('');
+  const [note, setNote] = useState('');
+  const [txId, setTxId] = useState(null);
+  const [transactionSuccess, setTransactionSuccess] = useState(false);
+  const [transactionFailed, setTransactionFailed] = useState(false);
   const { state } = useStore();
   const { id } = useParams();
+  const storage = useSecureStorage();
 
   const asset: {
     name: string;
@@ -69,34 +79,82 @@ const Send: React.FC = () => {
     };
   }, [account, assets, state.network, id]);
 
-  const closeModal = () => setModalOpen(false);
+  const confirmationModalClose = () => setConfirmationModalOpen(false);
+  const transactionModalClose = () => setTransactionModalOpen(false);
 
-  const send = () => {
-    closeModal();
+  const send = async () => {
+    setWaitingResponse(true);
+    setTransactionSuccess(false);
+    setTransactionFailed(false);
+    setTxId(null);
+    try {
+      if (account?.address) {
+        console.log("send account.address", account.address)
+
+        const decimals = 'decimals' in asset ? asset.decimals : 6;
+        const amountArray = amount.split('.');
+        const decimalsOnTheInput = amountArray.length > 1;
+        let amountToSend = BigInt(amountArray[0]) * BigInt(Math.pow(10, decimals));
+        if (decimalsOnTheInput) {
+          amountToSend +=
+            BigInt(amountArray[1]) * BigInt(Math.pow(10, decimals - amountArray[1].length));
+        }
+        const request: any = {
+          address: account.address,
+          txnParams: {
+            from: account.address,
+            to: receiver,
+            note: note !== '' ? note : "Voila!",
+            amount: amountToSend.toString(),
+          },
+          network: state.network
+        };
+        if ('asset-id' in asset) {
+          request.txnParams.type = 'axfer';
+          request.txnParams.assetIndex = asset['asset-id'];
+        } else {
+          request.txnParams.type = 'pay';
+        }
+        let response = await storage.signTransactions(
+          request
+        );
+        if ('error' in response) {
+          toast.error("Error");
+          setTransactionFailed(true);
+        } else {
+          setTxId(response.txId);
+          setTransactionSuccess(true);
+          toast.success("Success");
+        }
+      }
+    } catch (exception) {
+      console.error(exception)
+      toast.error("Error");
+      setTransactionFailed(true);
+    }
+    setWaitingResponse(false);
+    confirmationModalClose();
+    setTransactionModalOpen(true);
+    setAmount('');
+    setReceiver('');
+    setNote('');
   };
 
   return (
     <>
-      <Modal open={modalOpen} onClose={closeModal}>
-        <Card className="flex w-full items-center justify-center flex-col space-y-8">
-          You are about to send
-          <div className="p-4 flex space-x-4">
-            <Link to={'/'}>
-              <IconButton IconComponent={FaTimes} name="Cancel">
-                <span>Cancel</span>
-              </IconButton>
-            </Link>
-            <IconButton
-              IconComponent={FaPaperPlane}
-              name="Send"
-              onClick={send}
-              primary
-            >
-              <span>Send</span>
-            </IconButton>
-          </div>
-        </Card>
-      </Modal>
+      <ConfirmationModal
+        modalOpen={confirmationModalOpen}
+        onModalClose={confirmationModalClose}
+        waitingResponse={waitingResponse}
+        onConfirmClick={send} confirmationText={'You are about to add an asset'}
+      />
+      <TransactionModal
+        modalOpen={transactionModalOpen}
+        onModalClose={transactionModalClose}
+        transactionSuccess={transactionSuccess}
+        transactionFailed={transactionFailed}
+        transactionId={txId}
+      />
       <div>
         <h1 className="font-bold text-center md:text-left text-3xl md:text-5xl py-4">
           <span className="blue">Send</span> assets
@@ -120,7 +178,7 @@ const Send: React.FC = () => {
                         className={classNames(
                           'shadow-lg rounded-full text-white w-8 h-8',
                           !state.network.isMainnet &&
-                            'bg-orange-500 dark:bg-orange-600 p-1'
+                          'bg-orange-500 dark:bg-orange-600 p-1'
                         )}
                       />
                     </div>
@@ -169,6 +227,14 @@ const Send: React.FC = () => {
                 icon={<FaUser />}
               />
             </div>
+            <div>
+              <Input
+                placeholder={'Note'}
+                value={note}
+                onChange={setNote}
+                icon={<FaPencilAlt />}
+              />
+            </div>
           </div>
           <div className="p-4 flex space-x-4">
             <Link to={'/'}>
@@ -179,7 +245,7 @@ const Send: React.FC = () => {
             <IconButton
               IconComponent={FaCheck}
               name="Confirm"
-              onClick={() => setModalOpen(true)}
+              onClick={() => setConfirmationModalOpen(true)}
               primary
             >
               <span>Confirm</span>

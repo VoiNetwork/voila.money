@@ -16,8 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { useSecureStorage } from '../utils/storage';
 import NetworkSettings from './NetworkSettings';
 import { useDarkMode } from '../utils/darkMode';
+import Avatar from './Avatar';
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<{ toggleShowAccountDropDown: () => void }> = ({toggleShowAccountDropDown}) => {
   const { t } = useTranslation();
   const storage = useSecureStorage();
   const location = useLocation();
@@ -56,7 +57,7 @@ const Navbar: React.FC = () => {
                 iconOff={<FaSun size="0.8rem" />}
                 iconOn={<FaMoon size="0.8rem" />}
               />
-              {state.signedIn && (
+              {state.signedIn && state.primaryAddress && (
                 <>
                   <NetworkSettings />
                   <Link to="/settings">
@@ -77,7 +78,18 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <>
-              {state.signedIn && <NetworkSettings />}
+              {state.signedIn && state.primaryAddress &&
+                <>
+                  <div
+                    key={`ava-${state.primaryAddress}`}
+                    onClick={() => toggleShowAccountDropDown()}
+                    className={`transition-all cursor-pointer h-11 w-11 hover:w-12 hover:h-12`}
+                  >
+                    <Avatar content={state.primaryAddress} className={'min-w-max min-h-max'} />
+                  </div>
+                  <NetworkSettings />
+                </>
+              }
               <a href="/wallet.html" target="_blank" className="text-blue-400">
                 <FaExternalLinkAlt size="1.2rem" />
               </a>

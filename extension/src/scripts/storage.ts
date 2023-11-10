@@ -63,12 +63,12 @@ async function remove(name: string): Promise<void> {
   }
 }
 
-async function get<T>(name: string): Promise<T | null> {
+export async function get<T>(name: string): Promise<T | null> {
   if (storage) {
     updateStorageTimeout();
     const data = await storage.get(name);
     if (data) {
-      return JSON.parse(data);
+      return JSON.parse(data) as T;
     }
     return null;
   } else {
@@ -252,17 +252,4 @@ export async function importBackup(data: {
   } catch (e) {
     throw new Error((e as Error)?.message?.toString() || 'Invalid password');
   }
-}
-
-export async function signTransactions(data: {
-  groups: algosdk.TransactionLike[][];
-  address: string;
-}): Promise<{ txID: string; blob: Uint8Array }[][]> {
-  const sk = await get<Uint8Array>(data.address);
-  if (!sk) {
-    throw new Error('Account not found.');
-  }
-  return data.groups.map((group) => {
-    return group.map((txn) => algosdk.signTransaction(txn, sk));
-  });
 }

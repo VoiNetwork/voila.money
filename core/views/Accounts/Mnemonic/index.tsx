@@ -164,13 +164,15 @@ const Mnemonic: React.FC = () => {
           {!(mnemonic.every((w) => w === '') && textMnemonic === '') &&
             (account ? (
               <>
-                <FaCheckCircle />
+                <div className='text-green-600'>
+                  <FaCheckCircle />
+                </div>
                 <div className="flex space-x-2 items-center text-opacity-80 text-green-600 font-bold">
                   <span>
                     Mnemonic is valid! You are about to add this account:
                   </span>
                 </div>
-                <div className="flex justify-center p-2">
+                <div className="flex justify-center p-2 text-black">
                   <CopiableText text={account?.addr} />
                 </div>
               </>

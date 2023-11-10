@@ -1,44 +1,18 @@
-import { FunctionComponent } from 'react';
 import algorandTokenSvg from '../assets/networks/algorand-token.svg';
 import algorandTokenPng from '../assets/networks/algorand-token.png';
 import voiTokenSvg from '../assets/networks/voi-token.svg';
 import voiTokenPng from '../assets/networks/voi-token.png';
 import { getLocalState } from '../hooks/useLocalState';
 import algosdk from 'algosdk';
-
-export type NetworkToken = {
-  name: string;
-  ticker: string;
-  decimals: number;
-  svg: FunctionComponent;
-  png: string;
-};
-
-export type Node = {
-  token: string;
-  server: string;
-  port: number;
-  description?: string;
-};
-
-export type Network = {
-  id: string;
-  name: string;
-  description: string;
-  genesisId: string;
-  isMainnet: boolean;
-  token: NetworkToken;
-  node: Node;
-  indexer: Node;
-  faucet?: string;
-};
+import { Network } from '../../common/types'
 
 export const NETWORKS: Record<string, Network> = {
   VoiTestnet: {
     id: 'VoiTestnet',
     name: 'Voi',
     description: 'Voi Testnet Network',
-    genesisId: 'voi-test-v1',
+    genesisId: 'voitest-v1',
+    genesisHash: 'IXnoWtviVVJW5LGivNFc0Dq14V3kqaXuK2u5OQrdVZo=',
     isMainnet: false,
     token: {
       name: 'Voi',
