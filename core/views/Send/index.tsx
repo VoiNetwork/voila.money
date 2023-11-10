@@ -12,15 +12,14 @@ import {
 import IconButton from '../../components/IconButton';
 import { Link, useParams } from 'react-router-dom';
 import { useAccount } from '../../utils/account';
-import Modal from '../../components/Modal';
-import Card from '../../components/Card';
 import { useStore } from '../../utils/store';
 import { classNames } from '../../utils/common';
 import assetPlaceholder from '../../assets/asset.png';
 import Amount from '../../components/Amount';
 import { useSecureStorage } from '../../utils/storage';
 import toast from 'react-hot-toast';
-import CopiableText from '../../components/CopiableText';
+import ConfirmationModal from '../../components/ConfirmationModal';
+import TransactionModal from '../../components/TransactionModal';
 
 const Send: React.FC = () => {
   const { account, assets } = useAccount();
@@ -137,63 +136,25 @@ const Send: React.FC = () => {
     confirmationModalClose();
     setTransactionModalOpen(true);
     setAmount('');
-    setReceiver('')
+    setReceiver('');
+    setNote('');
   };
 
   return (
     <>
-      <Modal open={confirmationModalOpen} onClose={confirmationModalClose}>
-        <Card className="flex w-full items-center justify-center flex-col space-y-8">
-          {waitingResponse ?
-            `Waiting for transaction confirmation`
-            :
-            `You are about to send`
-          }
-          <div className="p-4 flex space-x-4">
-            {waitingResponse ?
-              <>
-                <div className="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-blue-600" />
-              </>
-              :
-              <>
-                <IconButton IconComponent={FaTimes} name="Cancel" onClick={confirmationModalClose}>
-                  <span>Cancel</span>
-                </IconButton>
-                <IconButton
-                  IconComponent={FaPaperPlane}
-                  name="Send"
-                  onClick={send}
-                  primary
-                  disabled={waitingResponse}
-                >
-                  <span>Send</span>
-                </IconButton>
-              </>
-            }
-          </div>
-        </Card>
-      </Modal>
-      <Modal open={transactionModalOpen} onClose={transactionModalClose}>
-        <Card className="flex w-full items-center justify-center flex-col space-y-8">
-          {transactionSuccess ?
-            `Transaction Successful`
-            :
-            transactionFailed ? `Transaction Failed` : `Transaction Unknown`
-          }
-          <div className='pt-6'>
-            {transactionSuccess && txId ? <CopiableText text={txId} full={false} showCopiedText={false} /> : null}
-          </div>
-          <div className="p-4 flex space-x-4">
-            <IconButton
-              IconComponent={FaCheck}
-              name="Ok"
-              onClick={() => transactionModalClose()}
-              primary
-            >
-            </IconButton>
-          </div>
-        </Card>
-      </Modal>
+      <ConfirmationModal
+        modalOpen={confirmationModalOpen}
+        onModalClose={confirmationModalClose}
+        waitingResponse={waitingResponse}
+        onConfirmClick={send} confirmationText={'You are about to add an asset'}
+      />
+      <TransactionModal
+        modalOpen={transactionModalOpen}
+        onModalClose={transactionModalClose}
+        transactionSuccess={transactionSuccess}
+        transactionFailed={transactionFailed}
+        transactionId={txId}
+      />
       <div>
         <h1 className="font-bold text-center md:text-left text-3xl md:text-5xl py-4">
           <span className="blue">Send</span> assets
