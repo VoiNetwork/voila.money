@@ -1,3 +1,5 @@
+import { extensionBrowser } from './chrome';
+
 /**
  * removeEmpty gets a dictionary and removes empty values
  * @param obj
@@ -31,4 +33,10 @@ export function obfuscateAddress(address: string, range: number = 10): string {
  */
 export function areBuffersEqual(b1: Uint8Array, b2: Uint8Array): boolean {
   return b1.every((value, index) => b2[index] === value);
+}
+
+
+export function isFromExtension(origin: string): boolean {
+  const s = origin.split('://');
+  return s[0] === 'chrome-extension' && s[1] === extensionBrowser.runtime.id;
 }
