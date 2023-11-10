@@ -17,6 +17,7 @@ interface State {
   network: Network;
   node: algosdk.Algodv2;
   indexer: algosdk.Indexer;
+  savedRequest: any;
 }
 
 export interface Action {
@@ -31,6 +32,7 @@ const initialState: State = {
   addresses: [],
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
+  savedRequest: undefined
 };
 
 export const ActionTypes = {

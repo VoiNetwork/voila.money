@@ -13,6 +13,7 @@ import { IS_DEVELOPMENT } from './common';
 import algosdk from 'algosdk';
 
 export const SecureMessageTypes = {
+  // UI Messages
   setPassword: 'setPassword',
   verifyPassword: 'verifyPassword',
   isPasswordSet: 'isPasswordSet',
@@ -26,7 +27,24 @@ export const SecureMessageTypes = {
   signTransactions: 'signTransactions',
   lock: 'lock',
   refresh: 'refresh',
+
+  //dApp Messages
+  heartbeat: 'heartbeat',
+  authorization: 'authorization',
+  enableAuthorization: 'enable-authorization',
+  authorizationAllow: 'authorization-allow',
+  authorizationDeny: 'authorization-deny',
+  signAllowWalletTx: 'sign-allow-wallet-tx',
+  signDeny: 'sign-deny',
+  signWalletTransaction: 'sign-wallet-transaction',
+  sendTransaction: 'send-transaction',
+  postTransactions: 'post-txns',
+  algod: 'algod',
+  indexer: 'indexer',
+  accounts: 'accounts',
 };
+
+
 
 // Storage gets removed from background script memory after this many seconds of inactivity using setTimeout
 // Use "lock" to make it happen sooner
@@ -176,6 +194,51 @@ export class SecureStorage {
       request
     });
   }
+
+  async heartbeat(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.heartbeat, { request });
+  }
+  async authorization(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.authorization, { request });
+  }
+  async enableAuthorization(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.enableAuthorization, { request });
+  }
+  async authorizationAllow(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.authorizationAllow,
+      { request }
+    );
+  }
+  async authorizationDeny(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.authorizationDeny,
+      { request }
+    );
+  }
+  async signAllowWalletTx(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.signAllowWalletTx, { request });
+  }
+  async signDeny(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.signDeny, { request });
+  }
+  async signWalletTransaction(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.signWalletTransaction, { request });
+  }
+  async sendTransaction(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.sendTransaction, { request });
+  }
+  async postTransactions(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.postTransactions, { request });
+  }
+  async algod(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.algod, { request });
+  }
+  async indexer(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.indexer, { request });
+  }
+  async accounts(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.accounts, { request });
+  }
+
 
   async importBackup(
     backup: string,

@@ -7,6 +7,82 @@ import { getValidatedTxnWrap } from '../transaction/actions'
 import { buildTransaction } from '../utils/transactionBuilder'
 import { get } from './storage'
 import { Buffer } from 'buffer';
+import { RequestError } from '../../../common/errors';
+import { extensionBrowser } from '../../../common/chrome';
+
+// Popup properties accounts for additional space needed for the title bar
+const titleBarHeight = 28;
+const popupProperties = {
+    type: 'popup',
+    focused: true,
+    width: 400,
+    height: 660 + titleBarHeight,
+};
+
+const requests: { [key: string]: any } = {};
+let authorized_pool: Array<string> = [];
+let authorized_pool_details: any = {};
+
+export function clearPool() {
+    authorized_pool = [];
+    authorized_pool_details = {};
+}
+
+export function isAuthorized(origin: string): boolean {
+    return authorized_pool.indexOf(origin) > -1;
+}
+
+export function isPreAuthorized(
+    origin: string,
+    genesisID: string,
+    requestedAccounts: Array<any>
+): boolean {
+    // Validate the origin is in the authorized pool
+    if (authorized_pool.indexOf(origin) === -1) {
+        return false;
+    }
+
+    // Validate the genesisID is previously authorized
+    if (
+        !authorized_pool_details[origin] ||
+        !(authorized_pool_details[origin]['genesisID'] === genesisID)
+    ) {
+        return false;
+    }
+
+    // Validate the requested accounts exist in the pool detail
+    for (let i = 0; i < requestedAccounts.length; i++) {
+        if (!authorized_pool_details[origin].accounts.includes(requestedAccounts[i])) {
+            return false;
+        }
+    }
+
+    // We made it through negative checks to accounts are currently authroized
+    return true;
+}
+
+function checkAccountIsImportedAndAuthorized(
+    network: string,
+    genesisID: string,
+    genesisHash: string,
+    address: string,
+    origin: string
+): void {
+    // Legacy authorized and internal calls will not have an origin in authorized pool details
+    if (authorized_pool_details[origin]) {
+        // This must be a dApp using enable - verify the ledger and address are authorized
+        if (
+            authorized_pool_details[origin]['genesisID'] !== genesisID ||
+            authorized_pool_details[origin]['ledger'] !== network ||
+            (genesisHash && authorized_pool_details[origin]['genesisHash'] !== genesisHash) ||
+            !authorized_pool_details[origin]['accounts'].includes(address)
+        ) {
+            throw RequestError.NoAccountMatch(address, network);
+        }
+    }
+    // Call the normal account check
+    checkAccountIsImported(genesisID, address);
+}
 
 export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<object> {
     const { network, address, txnParams } = data.request;
@@ -22,7 +98,6 @@ export async function signTransactions(data: { request: { address: string, netwo
         genesisHash: params.genesisHash,
     };
     if ('note' in txn) txn.note = new Uint8Array(Buffer.from(txn.note));
-
 
     let transactionWrap: BaseValidatedTxnWrap | undefined = undefined;
     try {
@@ -74,4 +149,128 @@ export async function signTransactions(data: { request: { address: string, netwo
     };
     const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
     return { txId: txId };
+}
+
+export async function heartbeat(data: { request: {} }): Promise<object> {
+    return {};
+}
+export async function authorization(data: { request: { originTabID: string, origin: string } }): Promise<object> {
+    const { originTabID, origin } = data.request;
+    // Delete any previous request made from the Tab that it's
+    // trying to connect.
+    delete requests[originTabID];
+
+    // If access was already granted, authorize connection.
+    if (isAuthorized(origin)) {
+        return data.request;
+    } else {
+        extensionBrowser.windows.create(
+            {
+                url: extensionBrowser.runtime.getURL('index.html#/authorize'),
+                ...popupProperties,
+            },
+            function (w: any) {
+                if (w) {
+                    requests[originTabID] = {
+                        window_id: w.id,
+                        message: data.request,
+                    };
+                    setTimeout(function () {
+                        extensionBrowser.runtime.sendMessage(data.request);
+                    }, 500);
+                }
+            }
+        );
+    }
+    return {};
+}
+export async function enableAuthorization(data: {}): Promise<object> {
+    return {};
+}
+export async function authorizationAllow(data: { request: { responseOriginTabID: string, isEnable: boolean, accounts: any, genesisID: string, genesisHash: string, ledger: { network: string } } }): Promise<object> {
+    const { responseOriginTabID, isEnable, accounts, genesisID, genesisHash, ledger: network } = data.request;
+
+    const auth = requests[responseOriginTabID];
+    const message = auth.message;
+    extensionBrowser.windows.remove(auth.window_id);
+    authorized_pool.push(message.origin);
+    delete requests[responseOriginTabID];
+
+    setTimeout(() => {
+        // Response needed
+        message.response = {};
+        // We need to send the authorized accounts and genesis info back if this is an enable call
+        if (isEnable) {
+            // Check that the requested accounts have been approved
+            const rejectedAccounts = [];
+            const sharedAccounts = [];
+            for (const i in accounts) {
+                if (
+                    (accounts[i]['requested'] && !accounts[i]['selected']) ||
+                    accounts[i]['missing']
+                ) {
+                    rejectedAccounts.push(accounts[i]['address']);
+                } else if (accounts[i]['selected']) {
+                    sharedAccounts.push(accounts[i]['address']);
+                }
+            }
+            if (rejectedAccounts.length > 0) {
+                message.error = RequestError.EnableRejected({ accounts: rejectedAccounts });
+            } else {
+                message.response = {
+                    genesisID: genesisID,
+                    genesisHash: genesisHash,
+                    accounts: sharedAccounts,
+                };
+
+                const poolDetails = { ...message.response, ledger: network };
+
+                // Add to the authorized pool details.
+                // This will be checked to restrict access for enable function users
+                authorized_pool_details[`${message.origin}`] = poolDetails;
+            }
+        }
+        return { message: message };
+    }, 100);
+
+    return { message: message, error: "timeout - authorizationAllow" };
+}
+export async function authorizationDeny(data: { request: { responseOriginTabID: string } }): Promise<object> {
+    const { responseOriginTabID } = data.request;
+    const auth = requests[responseOriginTabID];
+    const message = auth.message;
+
+    auth.message.error = RequestError.UserRejected;
+    extensionBrowser.windows.remove(auth.window_id);
+    delete requests[responseOriginTabID];
+
+    return { message: message };
+}
+export async function signAllowWalletTx(data: {}): Promise<object> {
+    return {};
+}
+export async function signDeny(data: {}): Promise<object> {
+    return {};
+}
+export async function signWalletTransaction(data: {}): Promise<object> {
+    return {};
+}
+export async function sendTransaction(data: {}): Promise<object> {
+    return {};
+}
+export async function postTransactions(data: {}): Promise<object> {
+    return {};
+}
+export async function algod(data: {}): Promise<object> {
+    return {};
+}
+export async function indexer(data: {}): Promise<object> {
+    return {};
+}
+export async function accounts(data: {}): Promise<object> {
+    return {};
+}
+
+function checkAccountIsImported(genesisID: string, address: string) {
+    throw new Error('Function not implemented.');
 }

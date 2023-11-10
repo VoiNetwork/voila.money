@@ -14,13 +14,28 @@ import {
   lock,
   refresh,
 } from './storage';
-
-import { signTransactions } from './internalMethods'
+import {
+  signTransactions,
+  heartbeat,
+  authorization,
+  enableAuthorization,
+  authorizationAllow,
+  authorizationDeny,
+  signAllowWalletTx,
+  signDeny,
+  signWalletTransaction,
+  sendTransaction,
+  postTransactions,
+  algod,
+  indexer,
+  accounts,
+} from './internalMethods'
 
 const SecureMessageListenerFunctionMap: Record<
   (typeof SecureMessageTypes)[keyof typeof SecureMessageTypes],
   (data: any) => Promise<any>
 > = {
+  // UI Messages
   [SecureMessageTypes.isPasswordSet]: isPasswordSet,
   [SecureMessageTypes.verifyPassword]: verifyPassword,
   [SecureMessageTypes.setPassword]: setPassword,
@@ -34,6 +49,21 @@ const SecureMessageListenerFunctionMap: Record<
   [SecureMessageTypes.lock]: lock,
   [SecureMessageTypes.refresh]: refresh,
   [SecureMessageTypes.signTransactions]: signTransactions,
+
+  //dApp Messages
+  [SecureMessageTypes.heartbeat]: heartbeat,
+  [SecureMessageTypes.authorization]: authorization,
+  [SecureMessageTypes.enableAuthorization]: enableAuthorization,
+  [SecureMessageTypes.authorizationAllow]: authorizationAllow,
+  [SecureMessageTypes.authorizationDeny]: authorizationDeny,
+  [SecureMessageTypes.signAllowWalletTx]: signAllowWalletTx,
+  [SecureMessageTypes.signDeny]: signDeny,
+  [SecureMessageTypes.signWalletTransaction]: signWalletTransaction,
+  [SecureMessageTypes.sendTransaction]: sendTransaction,
+  [SecureMessageTypes.postTransactions]: postTransactions,
+  [SecureMessageTypes.algod]: algod,
+  [SecureMessageTypes.indexer]: indexer,
+  [SecureMessageTypes.accounts]: accounts,
 };
 
 browser.runtime.onMessage.addListener(
