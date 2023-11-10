@@ -1,5 +1,6 @@
 import { Transaction } from 'algosdk';
 import AnyTransaction from 'algosdk/dist/types/types/transactions';
+import { Buffer } from 'buffer';
 
 export function buildTransaction(txn: object | any): Transaction {
   const builtTxn = new Transaction(txn as AnyTransaction);

@@ -112,7 +112,7 @@ const Home: React.FC = () => {
                 />
               ))}
             </div>
-            <div className="flex w-full max-w-screen-lg flex-col space-y-2">
+            <div className="flex w-full flex-col space-y-2">
               {emptyAssets.map((a: any) => (
                 <AssetBar
                   id={a['asset-id']}

@@ -6,6 +6,7 @@ import { ValidationStatus } from '../utils/validator';
 import { getValidatedTxnWrap } from '../transaction/actions'
 import { buildTransaction } from '../utils/transactionBuilder'
 import { get } from './storage'
+import { Buffer } from 'buffer';
 
 export async function signTransactions(data: { request: { address: string, network: Network, txnParams: any } }): Promise<object> {
     const { network, address, txnParams } = data.request;

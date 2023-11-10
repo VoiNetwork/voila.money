@@ -1,17 +1,9 @@
 import CryptoJS from 'crypto-js';
 import browser from 'webextension-polyfill';
 import { CryptoStorage } from './webcrypto/storage';
-import algosdk, { Transaction } from 'algosdk';
+import algosdk from 'algosdk';
 import { STORAGE_TIMEOUT_SECONDS } from '../../../core/utils/storage';
 import { Buffer } from 'buffer';
-import { getNodeClient } from '../../../core/utils/network';
-import { Network } from '../../../common/types'
-import AnyTransaction from 'algosdk/dist/types/types/transactions';
-import { BaseValidatedTxnWrap } from '../transaction/baseValidatedTxnWrap';
-import logging from '../../../common/logging';
-import { ValidationStatus } from '../utils/validator';
-import { getValidatedTxnWrap } from '../transaction/actions'
-import { buildTransaction } from '../utils/transactionBuilder'
 
 let storage: CryptoStorage | null = null;
 let storageExpiry: ReturnType<typeof setTimeout>;

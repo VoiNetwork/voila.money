@@ -3,6 +3,7 @@ import { WalletMultisigMetadata } from '../../../common/types';
 import { RequestError } from '../../../common//errors';
 import { Validate, ValidationResponse } from '../utils/validator';
 import { logging } from '../../../common/logging';
+import { Buffer } from 'buffer';
 
 type AssetInfo = {
   unitName: string;
