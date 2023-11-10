@@ -34,7 +34,7 @@ const initialState: State = {
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
   savedRequest: undefined,
-  arc200AppIds: ['']
+  arc200AppIds: ['6778021']
 };
 
 export const ActionTypes = {
