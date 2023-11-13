@@ -71,6 +71,7 @@ const Mnemonic: React.FC = () => {
         const [primaryAddress, addresses] = await storage.addAccount(
           algosdk.secretKeyToMnemonic(account.sk)
         );
+        // TODO fetch and add tokens
         dispatch(ActionTypes.UPDATE_DATA, {
           name: 'primaryAddress',
           data: primaryAddress,

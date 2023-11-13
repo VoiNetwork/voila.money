@@ -12,6 +12,7 @@ export const StorageKeys = {
   passwordHash: 'passwordHash',
   primaryAddress: 'primaryAddress',
   addresses: 'addresses',
+  tokens: 'tokens',
 };
 
 interface PasswordHash {
@@ -186,6 +187,21 @@ export async function removeAccount(data: {
   } else {
     return [primaryAddress, newAccounts];
   }
+}
+
+export async function getTokens(): Promise<number[]> {
+  return (await get(StorageKeys.tokens)) || [];
+}
+
+export async function addToken(data: {
+  token: number;
+}): Promise<[number, number[]]> {
+  const { token } = data;
+  const tokens: number[] = [
+    ...((await get<number[]>(StorageKeys.tokens)) || []),
+    token,
+  ];
+  return [token, tokens];
 }
 
 export async function refresh(): Promise<void> {
