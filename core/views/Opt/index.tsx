@@ -1,69 +1,86 @@
 import React, { useState } from 'react';
 import Input from '../../components/Input';
-import { FaCheck, FaChevronLeft, FaCoins } from 'react-icons/fa';
+import { FaCheck, FaChevronLeft, FaCoins, FaMoon, FaSun } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import IconButton from '../../components/IconButton';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import TransactionModal from '../../components/TransactionModal';
 import { useAccount } from '../../utils/account';
-import { useStore } from '../../utils/store';
+import { ActionTypes, useStore } from '../../utils/store';
 import { useSecureStorage } from '../../utils/storage';
 import toast from 'react-hot-toast';
+import Switch from '../../components/Switch';
+import arc200 from "arc200js";
 
 const Opt: React.FC = () => {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
   const { account, assets } = useAccount();
   const storage = useSecureStorage();
 
-  const [assetId, setAssetId] = useState('');
-  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [transactionModalOpen, setTransactionModalOpen] = useState(false);
-  const [waitingResponse, setWaitingResponse] = useState(false);
-  const [transactionSuccess, setTransactionSuccess] = useState(false);
-  const [transactionFailed, setTransactionFailed] = useState(false);
-  const [txId, setTxId] = useState(null);
+  const [assetId, setAssetId] = useState<string>('');
+  const [confirmationModalOpen, setConfirmationModalOpen] =
+    useState<boolean>(false);
+  const [transactionModalOpen, setTransactionModalOpen] =
+    useState<boolean>(false);
+  const [waitingResponse, setWaitingResponse] = useState<boolean>(false);
+  const [transactionSuccess, setTransactionSuccess] = useState<boolean>(false);
+  const [transactionFailed, setTransactionFailed] = useState<boolean>(false);
+  const [txId, setTxId] = useState<string | null>(null);
+  const [isNativeToken, setIsNativeToken] = useState<boolean>(true);
 
   const confirmationModalClose = () => setConfirmationModalOpen(false);
   const transactionModalClose = () => setTransactionModalOpen(false);
 
-  const send = async () => {//TODO: Add support for an ARC200 "opt in" (Not really an opt in) transaction
+  // TODO resolve token type from assetId
+  const send = async () => {
     setWaitingResponse(true);
     setTransactionSuccess(false);
     setTransactionFailed(false);
     setTxId(null);
     try {
       if (account?.address) {
-        console.log("send account.address", account.address)
-
-        const request: any = {
-          address: account.address,
-          txnParams: {
-            from: account.address,
-            to: account.address,
-            note: "Voila!",
-            amount: "0",
-            type: 'axfer',
-            assetIndex: parseInt(assetId)
-          },
-          network: state.network
-        };
-
-        let response = await storage.signTransactions(
-          request
-        );
-        console.log("response", response)
-        if ('error' in response) {
-          toast.error("Error");
-          setTransactionFailed(true);
+        console.log('send account.address', account.address);
+        if (isNativeToken) {
+          const request: any = {
+            address: account.address,
+            txnParams: {
+              from: account.address,
+              to: account.address,
+              note: 'Voila!',
+              amount: '0',
+              type: 'axfer',
+              assetIndex: parseInt(assetId),
+            },
+            network: state.network,
+          };
+          let response = await storage.signTransactions(request);
+          console.log('response', response);
+          if ('error' in response) {
+            toast.error('Error');
+            setTransactionFailed(true);
+          } else {
+            setTxId(response.txId);
+            setTransactionSuccess(true);
+            toast.success('Success');
+          }
         } else {
-          setTxId(response.txId);
+          //TODO: Add support for an ARC200 "opt in" (Not really an opt in) transaction
+          console.log('Not yet implemented');
+          console.log('assetId', assetId);
+          const [token, tokens] = await storage.addToken(assetId);
+          console.log('tokens', tokens);
+          dispatch(ActionTypes.UPDATE_DATA, {
+            name: 'tokens',
+            data: { tokens }
+          });
+          setTxId('xxxxxxxxx');
           setTransactionSuccess(true);
-          toast.success("Success");
+          toast.success('Success');
         }
       }
     } catch (exception) {
-      console.error(exception)
-      toast.error("Error");
+      console.error(exception);
+      toast.error('Error');
       setTransactionFailed(true);
     }
     setWaitingResponse(false);
@@ -78,7 +95,8 @@ const Opt: React.FC = () => {
         modalOpen={confirmationModalOpen}
         onModalClose={confirmationModalClose}
         waitingResponse={waitingResponse}
-        onConfirmClick={send} confirmationText={'You are about to add an asset'}
+        onConfirmClick={send}
+        confirmationText={'You are about to add an asset'}
       />
       <TransactionModal
         modalOpen={transactionModalOpen}
@@ -92,9 +110,18 @@ const Opt: React.FC = () => {
           <span className="blue">Add</span> asset
         </h1>
         <div className="flex w-full items-center justify-center flex-col space-y-8 py-16">
+          <div className="flex w-full items-center justify-center flex-col">
+            <span>{isNativeToken ? 'VSA' : 'VRC200'}</span>
+            <Switch
+              id={'toggle-theme'}
+              name={'toggle-theme'}
+              checked={!!isNativeToken}
+              onChange={() => setIsNativeToken(!isNativeToken)}
+            />
+          </div>
           <div>
             <Input
-              placeholder={"ID"}
+              placeholder={'ID'}
               value={assetId}
               onChange={setAssetId}
               icon={<FaCoins />}

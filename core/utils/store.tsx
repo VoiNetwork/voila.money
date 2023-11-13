@@ -14,6 +14,7 @@ interface State {
   signedIn: boolean;
   primaryAddress?: string;
   addresses: string[];
+  tokens: string[];
   network: Network;
   node: algosdk.Algodv2;
   indexer: algosdk.Indexer;
@@ -31,6 +32,7 @@ const initialState: State = {
   network: NETWORKS.VoiTestnet,
   signedIn: false,
   addresses: [],
+  tokens: [],
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
   savedRequest: undefined,
