@@ -16,6 +16,7 @@ import {
   AssetParams,
   TransactionInformation,
 } from '../../common/types';
+import { useSecureStorage } from './storage';
 const arc200 = require('arc200js');
 
 interface AccountProviderProps {
@@ -62,16 +63,25 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     {}
   );
   const [tokens, setTokens] = useLocalState<TokenCache>('tokens', {});
-
   const flagRef = useRef<number>(0);
+  let storage: any = null;
+  try {
+    storage = useSecureStorage();
+  } catch (e) {
+
+  }
 
   const updateAccountCreatedApps = useCallback(async () => {
+    console.log("updateAccountCreatedApps")
     const networkId = state.network.id;
     if (networkId && account) {
       const chunkSize = 1;
       const unknownTokens = account['created-apps']?.filter(
         (a) => !tokens[networkId] || !tokens[networkId][a['id']]
       );
+      console.log("unknownTokens", unknownTokens)
+      console.log("account", account)
+      console.log("tokens", tokens)
       const toks: BaseToken[] = [];
       for (let i = 0; i < unknownTokens?.length; i += chunkSize) {
         const chunk = unknownTokens.slice(i, i + chunkSize);
@@ -97,6 +107,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   }, [updateAccountCreatedApps]);
 
   const updateAccountTransactions = useCallback(async () => {
+    console.log("updateAccountTransactions")
     const networkId = state.network.id;
     const txns = [];
     if (networkId && account) {
@@ -136,6 +147,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   }, [updateAccountTransactions]);
 
   const updateAccountAssets = useCallback(async () => {
+    console.log("updateAccountAssets")
     const networkId = state.network.id;
     if (networkId && account) {
       const chunkSize = 5;
@@ -171,6 +183,44 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   useEffect(() => {
     updateAccountAssets();
   }, [updateAccountAssets]);
+
+
+  const updateAccountTokens = useCallback(async () => {
+    const networkId = state.network.id;
+    if (tokens && storage) {
+      console.log("storage.getTokens()", storage);
+      let optedInTokens = null;
+      try {
+        optedInTokens = await storage.getTokens();
+      } catch (e) {
+
+      }
+      if (optedInTokens) {
+        console.log("optedInTokens", optedInTokens)
+        const toks: BaseToken[] = [];
+        for (let i = 0; i < optedInTokens?.length; i++) {
+          const id = optedInTokens[i];
+          const ci = new arc200(id, state.node);
+          const tm = await ci.getMetadata();
+          if (!tm.success) continue;
+          toks.push({ id, ...tm.returnValue });
+        }
+        console.log("toks", toks)
+        setTokens((a) => {
+          const newTokens = { ...a };
+          if (!newTokens[networkId]) newTokens[networkId] = {};
+          toks.forEach((u) => {
+            newTokens[networkId][u.id] = u;
+          });
+          return newTokens;
+        });
+      }
+    }
+  }, [account]);
+
+  useEffect(() => {
+    updateAccountTokens();
+  }, [updateAccountTokens]);
 
   const fetchData = useCallback(async () => {
     if (state.primaryAddress) {
