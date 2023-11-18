@@ -22,7 +22,7 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import TransactionModal from '../../components/TransactionModal';
 
 const Send: React.FC = () => {
-  const { account, assets } = useAccount();
+  const { account, assets, tokens } = useAccount();
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [waitingResponse, setWaitingResponse] = useState(false);
@@ -30,11 +30,18 @@ const Send: React.FC = () => {
   const [receiver, setReceiver] = useState('');
   const [note, setNote] = useState('');
   const [txId, setTxId] = useState(null);
+  const [isVsa, setIsVsa] = useState(true);
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [transactionFailed, setTransactionFailed] = useState(false);
   const { state } = useStore();
   const { id } = useParams();
   const storage = useSecureStorage();
+
+  Object.values(tokens).forEach((e) => {
+    if (id && parseInt(id) === e.id) {
+      setIsVsa(false);
+    }
+  });
 
   const asset: {
     name: string;

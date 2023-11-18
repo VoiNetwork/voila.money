@@ -7,7 +7,7 @@ import assetPlaceholder from '../../assets/asset.png';
 import Card from '../../components/Card';
 import { classNames } from '../../utils/common';
 import { Link, useNavigate } from 'react-router-dom';
-import { Network } from '../../utils/network';
+import { Network } from '../../../common/types'
 import { useStore } from '../../utils/store';
 
 interface TokenBarProps {
