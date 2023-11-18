@@ -10,7 +10,8 @@ import { ActionTypes, useStore } from '../../utils/store';
 import { useSecureStorage } from '../../utils/storage';
 import toast from 'react-hot-toast';
 import Switch from '../../components/Switch';
-const arc200 = require('arc200js');
+// @ts-ignore
+import arc200 from 'arc200js';
 
 const Opt: React.FC = () => {
   const { state, dispatch } = useStore();

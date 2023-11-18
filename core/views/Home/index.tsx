@@ -10,7 +10,8 @@ import IconButton from '../../components/IconButton';
 import { Link } from 'react-router-dom';
 import { AccountAssetInformation } from '../../../common/types';
 import { useSecureStorage } from '../../utils/storage';
-const arc200 = require('arc200js');
+// @ts-ignore
+import arc200 from 'arc200js';
 import TokenBar from './TokenBar';
 
 const Home: React.FC = () => {
@@ -118,7 +119,7 @@ const Home: React.FC = () => {
         {(account?.amount || 0) > 0 && (
           <>
             <div className="w-full flex-col space-y-2 justify-center">
-              {holdingAssets.length < 1 && emptyAssets.length < 1 ? (
+              { holdingAssets.length < 1 && emptyAssets.length < 1 && Object.values(tokens).length < 1 ? (
                 <div className="flex w-full justify-center">
                   <Card className="opacity-50 md:w-1/3">
                     <div className="text-center w-full">

@@ -17,7 +17,8 @@ import {
   TransactionInformation,
 } from '../../common/types';
 import { useSecureStorage } from './storage';
-const arc200 = require('arc200js');
+// @ts-ignore
+import arc200 from 'arc200js';
 
 interface AccountProviderProps {
   children: JSX.Element | JSX.Element[];
@@ -189,7 +190,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     const networkId = state.network.id;
     if (tokens && storage) {
       console.log("storage.getTokens()", storage);
-      let optedInTokens = null;
+      let optedInTokens: null | string[] = null;
       try {
         optedInTokens = await storage.getTokens();
       } catch (e) {
@@ -199,7 +200,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
         console.log("optedInTokens", optedInTokens)
         const toks: BaseToken[] = [];
         for (let i = 0; i < optedInTokens?.length; i++) {
-          const id = optedInTokens[i];
+          const id = parseInt(optedInTokens[i]);
           const ci = new arc200(id, state.node);
           const tm = await ci.getMetadata();
           if (!tm.success) continue;
