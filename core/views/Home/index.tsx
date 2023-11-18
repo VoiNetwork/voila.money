@@ -10,7 +10,7 @@ import IconButton from '../../components/IconButton';
 import { Link } from 'react-router-dom';
 import { AccountAssetInformation } from '../../../common/types';
 import { useSecureStorage } from '../../utils/storage';
-import arc200 from 'arc200js';
+const arc200 = require('arc200js');
 import TokenBar from './TokenBar';
 
 const Home: React.FC = () => {
@@ -35,6 +35,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (account && tokens) {
       (async () => {
+        console.log("tokens", tokens)
+        console.log("account", account)
         const balances = (
           await Promise.all(
             Object.values(tokens).map(async (t) => {
@@ -44,6 +46,7 @@ const Home: React.FC = () => {
             })
           )
         ).reduce((a, b) => ({ ...a, ...b }), {});
+        console.log("balances", balances)
         setBalances(balances);
       })();
     }

@@ -14,12 +14,10 @@ interface State {
   signedIn: boolean;
   primaryAddress?: string;
   addresses: string[];
-  tokens: string[];
   network: Network;
   node: algosdk.Algodv2;
   indexer: algosdk.Indexer;
   savedRequest: any;
-  arc200AppIds: string[];
 }
 
 export interface Action {
@@ -32,11 +30,9 @@ const initialState: State = {
   network: NETWORKS.VoiTestnet,
   signedIn: false,
   addresses: [],
-  tokens: [],
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
   savedRequest: undefined,
-  arc200AppIds: ['6778021']
 };
 
 export const ActionTypes = {

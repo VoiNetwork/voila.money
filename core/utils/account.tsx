@@ -16,7 +16,7 @@ import {
   AssetParams,
   TransactionInformation,
 } from '../../common/types';
-import arc200 from 'arc200js';
+const arc200 = require('arc200js');
 
 interface AccountProviderProps {
   children: JSX.Element | JSX.Element[];

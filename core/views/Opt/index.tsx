@@ -10,13 +10,12 @@ import { ActionTypes, useStore } from '../../utils/store';
 import { useSecureStorage } from '../../utils/storage';
 import toast from 'react-hot-toast';
 import Switch from '../../components/Switch';
-import arc200 from "arc200js";
+const arc200 = require('arc200js');
 
 const Opt: React.FC = () => {
   const { state, dispatch } = useStore();
   const { account, assets } = useAccount();
   const storage = useSecureStorage();
-
   const [assetId, setAssetId] = useState<string>('');
   const [confirmationModalOpen, setConfirmationModalOpen] =
     useState<boolean>(false);
@@ -67,15 +66,21 @@ const Opt: React.FC = () => {
           //TODO: Add support for an ARC200 "opt in" (Not really an opt in) transaction
           console.log('Not yet implemented');
           console.log('assetId', assetId);
-          const [token, tokens] = await storage.addToken(assetId);
-          console.log('tokens', tokens);
-          dispatch(ActionTypes.UPDATE_DATA, {
-            name: 'tokens',
-            data: { tokens }
-          });
-          setTxId('xxxxxxxxx');
-          setTransactionSuccess(true);
-          toast.success('Success');
+          const optedInTokens: number[] = await storage.getTokens();
+          console.log("optedInTokens", optedInTokens)
+          if (optedInTokens.indexOf(parseInt(assetId)) > 0) {//Already opted in
+            toast.success('Already Opted In');
+          } else {
+            const [token, tokens] = await storage.addToken(assetId);
+            console.log('tokens', tokens);
+            dispatch(ActionTypes.UPDATE_DATA, {
+              name: 'tokens',
+              data: { tokens }
+            });
+            setTxId('xxxxxxxxx');
+            setTransactionSuccess(true);
+            toast.success('Success');
+          }
         }
       }
     } catch (exception) {
@@ -113,8 +118,8 @@ const Opt: React.FC = () => {
           <div className="flex w-full items-center justify-center flex-col">
             <span>{isNativeToken ? 'VSA' : 'VRC200'}</span>
             <Switch
-              id={'toggle-theme'}
-              name={'toggle-theme'}
+              id={'toggle-assettype'}
+              name={'toggle-assettype'}
               checked={!!isNativeToken}
               onChange={() => setIsNativeToken(!isNativeToken)}
             />

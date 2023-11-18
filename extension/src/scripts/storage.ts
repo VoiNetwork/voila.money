@@ -193,7 +193,7 @@ export async function getTokens(): Promise<number[]> {
   return (await get(StorageKeys.tokens)) || [];
 }
 
-export async function addToken(data: {
+export async function addToken(data: {//TODO: Refactor to store tokens on a per account basis
   token: number;
 }): Promise<[number, number[]]> {
   const { token } = data;
@@ -201,6 +201,7 @@ export async function addToken(data: {
     ...((await get<number[]>(StorageKeys.tokens)) || []),
     token,
   ];
+  await set(StorageKeys.tokens, tokens);
   return [token, tokens];
 }
 
