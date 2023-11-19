@@ -7,6 +7,8 @@ import {
   addAccount,
   removeAccount,
   getAddresses,
+  getTokens,
+  addToken,
   createBackup,
   importBackup,
   getPrimaryAddress,
@@ -29,6 +31,7 @@ import {
   algod,
   indexer,
   accounts,
+  signTokenTransactions,
 } from './internalMethods'
 
 const SecureMessageListenerFunctionMap: Record<
@@ -43,11 +46,14 @@ const SecureMessageListenerFunctionMap: Record<
   [SecureMessageTypes.getPrimaryAddress]: getPrimaryAddress,
   [SecureMessageTypes.getAddresses]: getAddresses,
   [SecureMessageTypes.addAccount]: addAccount,
+  [SecureMessageTypes.getTokens]: getTokens,
+  [SecureMessageTypes.addToken]: addToken,
   [SecureMessageTypes.removeAccount]: removeAccount,
   [SecureMessageTypes.createBackup]: createBackup,
   [SecureMessageTypes.importBackup]: importBackup,
   [SecureMessageTypes.lock]: lock,
   [SecureMessageTypes.refresh]: refresh,
+  [SecureMessageTypes.signTokenTransactions] : signTokenTransactions,
   [SecureMessageTypes.signTransactions]: signTransactions,
 
   //dApp Messages

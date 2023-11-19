@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import IconButton from '../components/IconButton';
 import { IS_DEVELOPMENT } from './common';
-import algosdk from 'algosdk';
 
 export const SecureMessageTypes = {
   // UI Messages
@@ -21,9 +20,12 @@ export const SecureMessageTypes = {
   getPrimaryAddress: 'getPrimaryAddress',
   getAddresses: 'getAddresses',
   addAccount: 'addAccount',
+  getTokens: 'getTokens',
+  addToken: 'addToken',
   removeAccount: 'removeAccount',
   createBackup: 'createBackup',
   importBackup: 'importBackup',
+  signTokenTransactions: 'signTokenTransactions',
   signTransactions: 'signTransactions',
   lock: 'lock',
   refresh: 'refresh',
@@ -43,8 +45,6 @@ export const SecureMessageTypes = {
   indexer: 'indexer',
   accounts: 'accounts',
 };
-
-
 
 // Storage gets removed from background script memory after this many seconds of inactivity using setTimeout
 // Use "lock" to make it happen sooner
@@ -183,15 +183,31 @@ export class SecureStorage {
     });
   }
 
+  async getTokens(): Promise<number[]> {
+    return await this.handleMessage(SecureMessageTypes.getTokens);
+  }
+
+  async addToken(token: string): Promise<[number, number[]]> {
+    return await this.handleMessage(SecureMessageTypes.addToken, {
+      token,
+    });
+  }
+
   async createBackup(password: string): Promise<string> {
     return await this.handleMessage(SecureMessageTypes.createBackup, {
       password,
     });
   }
 
+  async signTokenTransactions(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.signTokenTransactions, {
+      request,
+    });
+  }
+
   async signTransactions(request: any): Promise<any> {
     return await this.handleMessage(SecureMessageTypes.signTransactions, {
-      request
+      request,
     });
   }
 
@@ -199,35 +215,47 @@ export class SecureStorage {
     return await this.handleMessage(SecureMessageTypes.heartbeat, { request });
   }
   async authorization(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.authorization, { request });
+    return await this.handleMessage(SecureMessageTypes.authorization, {
+      request,
+    });
   }
   async enableAuthorization(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.enableAuthorization, { request });
+    return await this.handleMessage(SecureMessageTypes.enableAuthorization, {
+      request,
+    });
   }
   async authorizationAllow(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.authorizationAllow,
-      { request }
-    );
+    return await this.handleMessage(SecureMessageTypes.authorizationAllow, {
+      request,
+    });
   }
   async authorizationDeny(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.authorizationDeny,
-      { request }
-    );
+    return await this.handleMessage(SecureMessageTypes.authorizationDeny, {
+      request,
+    });
   }
   async signAllowWalletTx(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.signAllowWalletTx, { request });
+    return await this.handleMessage(SecureMessageTypes.signAllowWalletTx, {
+      request,
+    });
   }
   async signDeny(request: any): Promise<any> {
     return await this.handleMessage(SecureMessageTypes.signDeny, { request });
   }
   async signWalletTransaction(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.signWalletTransaction, { request });
+    return await this.handleMessage(SecureMessageTypes.signWalletTransaction, {
+      request,
+    });
   }
   async sendTransaction(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.sendTransaction, { request });
+    return await this.handleMessage(SecureMessageTypes.sendTransaction, {
+      request,
+    });
   }
   async postTransactions(request: any): Promise<any> {
-    return await this.handleMessage(SecureMessageTypes.postTransactions, { request });
+    return await this.handleMessage(SecureMessageTypes.postTransactions, {
+      request,
+    });
   }
   async algod(request: any): Promise<any> {
     return await this.handleMessage(SecureMessageTypes.algod, { request });
@@ -238,7 +266,6 @@ export class SecureStorage {
   async accounts(request: any): Promise<any> {
     return await this.handleMessage(SecureMessageTypes.accounts, { request });
   }
-
 
   async importBackup(
     backup: string,

@@ -32,7 +32,7 @@ const initialState: State = {
   addresses: [],
   node: getNodeClient(NETWORKS.VoiTestnet),
   indexer: getIndexerClient(NETWORKS.VoiTestnet),
-  savedRequest: undefined
+  savedRequest: undefined,
 };
 
 export const ActionTypes = {

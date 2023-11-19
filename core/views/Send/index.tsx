@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Input from '../../components/Input';
 import {
   FaCheck,
@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import IconButton from '../../components/IconButton';
 import { Link, useParams } from 'react-router-dom';
-import { useAccount } from '../../utils/account';
+import { BaseToken, useAccount } from '../../utils/account';
 import { useStore } from '../../utils/store';
 import { classNames } from '../../utils/common';
 import assetPlaceholder from '../../assets/asset.png';
@@ -20,9 +20,12 @@ import { useSecureStorage } from '../../utils/storage';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import TransactionModal from '../../components/TransactionModal';
+// @ts-ignore
+import arc200 from 'arc200js';
+import { AccountInformation } from '../../../common/types';
 
 const Send: React.FC = () => {
-  const { account, assets } = useAccount();
+  const { account, assets, tokens } = useAccount();
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
   const [waitingResponse, setWaitingResponse] = useState(false);
@@ -30,11 +33,57 @@ const Send: React.FC = () => {
   const [receiver, setReceiver] = useState('');
   const [note, setNote] = useState('');
   const [txId, setTxId] = useState(null);
+  const [isVsa, setIsVsa] = useState(true);
   const [transactionSuccess, setTransactionSuccess] = useState(false);
   const [transactionFailed, setTransactionFailed] = useState(false);
   const { state } = useStore();
   const { id } = useParams();
   const storage = useSecureStorage();
+  const [isPending, setIsPending] = useState(true);
+
+  const [arc200Balance, setArc200Balance] = useState(0);
+  const [arc200Token, setArc200Token] = useState<BaseToken | null>(null);
+  const [arc200ContractInterface, setArc200ContractInterface] = useState<any | null>(null);
+
+
+
+  async function getBalance(ci: any, account: AccountInformation) {
+    const bal = await ci.arc200_balanceOf(account.address);
+    return bal.returnValue;
+  }
+
+  useEffect(() => {
+    let isArc200 = false;
+    let array = Object.values(tokens);
+    for (let index = 0; index < Object.values(tokens).length; index++) {
+      const element = array[index];
+      if (id && parseInt(id) === element.id) {
+        isArc200 = true;
+        break;
+      }
+    }
+    setIsVsa(!isArc200);
+    setIsPending(isArc200);
+  }, [id])
+
+  // EFFECT: setup Arc200 needed objects
+  useEffect(() => {
+    if (account && tokens && id && !isVsa) {
+      (async () => {
+        console.log("tokens", tokens)
+        console.log("account", account)
+        const numberId = Number.parseInt(id || '');
+        const t = tokens[numberId];
+        const ci = new arc200(t.id, state.node);
+        const balance = await getBalance(ci, account);
+        console.log("balances", balance)
+        setArc200Balance(balance);
+        console.log("arc200Token", t)
+        setArc200Token(t);
+        setArc200ContractInterface(ci);
+      })();
+    }
+  }, [account, tokens, id]);
 
   const asset: {
     name: string;
@@ -53,22 +102,42 @@ const Send: React.FC = () => {
           amount: Math.max(0, account.amount - account['min-balance']),
         };
       } else {
-        const a = assets[numberId];
-        let name = 'Unknown';
-        let ticker = '';
-        try {
-          name = window.atob(a?.['name-b64']);
-          ticker = window.atob(a?.['unit-name-b64']);
-        } catch {
-          // pass
+        if (isVsa) {
+          const a = assets[numberId];
+          let name = 'Unknown';
+          let ticker = '';
+          try {
+            name = window.atob(a?.['name-b64']);
+            ticker = window.atob(a?.['unit-name-b64']);
+          } catch {
+            // pass
+          }
+          const userA = account.assets.find((a) => a['asset-id'] === numberId);
+          return {
+            name: a?.name || name,
+            ticker: a?.['unit-name'] || ticker,
+            decimals: a?.decimals || 0,
+            amount: userA?.amount || 0,
+          };
+        } else {
+          if (arc200Token && arc200Balance) {
+            setIsPending(false);
+            return {
+              name: arc200Token.name,
+              ticker: arc200Token.symbol,
+              decimals: arc200Token.decimals,
+              amount: arc200Balance,
+            };
+          } else {
+            return {
+              name: "Pending",
+              ticker: "Pending",
+              decimals: 0,
+              amount: 0,
+            };
+          }
+
         }
-        const userA = account.assets.find((a) => a['asset-id'] === numberId);
-        return {
-          name: a?.name || name,
-          ticker: a?.['unit-name'] || ticker,
-          decimals: a?.decimals || 0,
-          amount: userA?.amount || 0,
-        };
       }
     }
     return {
@@ -91,7 +160,7 @@ const Send: React.FC = () => {
       if (account?.address) {
         console.log("send account.address", account.address)
 
-        const decimals = 'decimals' in asset ? asset.decimals : 6;
+        const decimals = 'decimals' in asset ? Number(asset.decimals) : 6;
         const amountArray = amount.split('.');
         const decimalsOnTheInput = amountArray.length > 1;
         let amountToSend = BigInt(amountArray[0]) * BigInt(Math.pow(10, decimals));
@@ -99,32 +168,51 @@ const Send: React.FC = () => {
           amountToSend +=
             BigInt(amountArray[1]) * BigInt(Math.pow(10, decimals - amountArray[1].length));
         }
-        const request: any = {
-          address: account.address,
-          txnParams: {
-            from: account.address,
-            to: receiver,
-            note: note !== '' ? note : "Voila!",
-            amount: amountToSend.toString(),
-          },
-          network: state.network
-        };
-        if ('asset-id' in asset) {
-          request.txnParams.type = 'axfer';
-          request.txnParams.assetIndex = asset['asset-id'];
+
+        let response;
+        if (isVsa) {
+          const request: any = {
+            address: account.address,
+            txnParams: {
+              from: account.address,
+              to: receiver,
+              note: note !== '' ? note : "Voila!",
+              amount: amountToSend.toString(),
+            },
+            network: state.network
+          };
+          if ('asset-id' in asset) {
+            request.txnParams.type = 'axfer';
+            request.txnParams.assetIndex = asset['asset-id'];
+          } else {
+            request.txnParams.type = 'pay';
+          }
+          response = await storage.signTransactions(
+            request
+          );
         } else {
-          request.txnParams.type = 'pay';
+          const request: any = {
+            appId: id,
+            fromAddress: account.address,
+            toAddress: receiver,
+            network: state.network,
+            amount: amountToSend.toString(),
+          }
+          response = await storage.signTokenTransactions(request);
         }
-        let response = await storage.signTransactions(
-          request
-        );
-        if ('error' in response) {
+        console.log("response", response)
+        if (response) {
+          if ('error' in response) {
+            toast.error("Error");
+            setTransactionFailed(true);
+          } else {
+            setTxId(response.txId);
+            setTransactionSuccess(true);
+            toast.success("Success");
+          }
+        } else {
           toast.error("Error");
           setTransactionFailed(true);
-        } else {
-          setTxId(response.txId);
-          setTransactionSuccess(true);
-          toast.success("Success");
         }
       }
     } catch (exception) {
@@ -139,6 +227,9 @@ const Send: React.FC = () => {
     setReceiver('');
     setNote('');
   };
+
+  console.log("asset", asset);
+  console.log("isPending", isPending);
 
   return (
     <>
@@ -214,7 +305,7 @@ const Send: React.FC = () => {
               </div>
               <div className="text-xs opacity-80 p-2">
                 Available:{' '}
-                <Amount amount={asset.amount} decimals={asset.decimals} />
+                <Amount amount={Number(asset.amount)} decimals={Number(asset.decimals)} />
               </div>
             </div>
 
@@ -247,6 +338,7 @@ const Send: React.FC = () => {
               name="Confirm"
               onClick={() => setConfirmationModalOpen(true)}
               primary
+              disabled={isPending || amount === "" || receiver === ""}
             >
               <span>Confirm</span>
             </IconButton>
