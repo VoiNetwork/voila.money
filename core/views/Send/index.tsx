@@ -338,7 +338,7 @@ const Send: React.FC = () => {
               name="Confirm"
               onClick={() => setConfirmationModalOpen(true)}
               primary
-              disabled={isPending}
+              disabled={isPending || amount === "" || receiver === ""}
             >
               <span>Confirm</span>
             </IconButton>
