@@ -39,6 +39,7 @@ const Send: React.FC = () => {
   const { state } = useStore();
   const { id } = useParams();
   const storage = useSecureStorage();
+  const [isPending, setIsPending] = useState(true);
 
   const [arc200Balance, setArc200Balance] = useState(0);
   const [arc200Token, setArc200Token] = useState<BaseToken | null>(null);
@@ -52,12 +53,18 @@ const Send: React.FC = () => {
   }
 
   useEffect(() => {
-    Object.values(tokens).forEach((e) => {
-      if (id && parseInt(id) === e.id) {
-        setIsVsa(false);
+    let isArc200 = false;
+    let array = Object.values(tokens);
+    for (let index = 0; index < Object.values(tokens).length; index++) {
+      const element = array[index];
+      if (id && parseInt(id) === element.id) {
+        isArc200 = true;
+        break;
       }
-    });
-  }, [])
+    }
+    setIsVsa(!isArc200);
+    setIsPending(isArc200);
+  }, [id])
 
   // EFFECT: setup Arc200 needed objects
   useEffect(() => {
@@ -113,12 +120,23 @@ const Send: React.FC = () => {
             amount: userA?.amount || 0,
           };
         } else {
-          return {
-            name: arc200Token?.name || "Pending",
-            ticker: arc200Token?.symbol || "Pending",
-            decimals: arc200Token?.decimals || 0,
-            amount: arc200Balance || 0,
-          };
+          if (arc200Token && arc200Balance) {
+            setIsPending(false);
+            return {
+              name: arc200Token.name,
+              ticker: arc200Token.symbol,
+              decimals: arc200Token.decimals,
+              amount: arc200Balance,
+            };
+          } else {
+            return {
+              name: "Pending",
+              ticker: "Pending",
+              decimals: 0,
+              amount: 0,
+            };
+          }
+
         }
       }
     }
@@ -209,6 +227,9 @@ const Send: React.FC = () => {
     setReceiver('');
     setNote('');
   };
+
+  console.log("asset", asset);
+  console.log("isPending", isPending);
 
   return (
     <>
@@ -317,6 +338,7 @@ const Send: React.FC = () => {
               name="Confirm"
               onClick={() => setConfirmationModalOpen(true)}
               primary
+              disabled={isPending}
             >
               <span>Confirm</span>
             </IconButton>
