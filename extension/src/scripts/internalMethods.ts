@@ -9,6 +9,8 @@ import { get } from './storage';
 import { Buffer } from 'buffer';
 import { RequestError } from '../../../common/errors';
 import { extensionBrowser } from '../../../common/chrome';
+// @ts-ignore
+import arc200 from 'arc200js';
 
 // Popup properties accounts for additional space needed for the title bar
 const titleBarHeight = 28;
@@ -87,6 +89,28 @@ function checkAccountIsImportedAndAuthorized(
   checkAccountIsImported(genesisID, address);
 }
 
+export async function signTokenTransactions(data: {
+  request: { appId: string, fromAddress: string, toAddress: string, network: Network, amount: string }
+}): Promise<object> {
+  const { appId, fromAddress, toAddress, network, amount } = data.request;
+  const sk = (await get<Uint8Array>(fromAddress)) as Uint8Array;
+  if (!sk) {
+    throw new Error('Account not found.');
+  }
+  let keyArray: number[] = [];
+  for (const [key, value] of Object.entries(sk)) {
+    keyArray.push(value);
+  }
+  const uintSK = new Uint8Array(keyArray);
+  const numberId = Number.parseInt(appId || '');
+  const parsedAmount = BigInt(amount);
+  const algod = getNodeClient(network);
+  const opts = { acc: { addr: fromAddress, sk: uintSK }, simulate: true, formatBytes: true }
+  const ci = new arc200(numberId, algod, opts);
+  const response = await ci.arc200_transfer(toAddress, parsedAmount, false, true);
+  return response;
+}
+
 export async function signTransactions(data: {
   request: { address: string; network: Network; txnParams: any };
 }): Promise<object> {
@@ -153,7 +177,7 @@ export async function signTransactions(data: {
     blob: builtTx.signTxn(uintSK),
   };
   const { txId } = await algod.sendRawTransaction(signedTxn.blob).do();
-  return { txId: txId };
+  return { txId: txId, success: true };
 }
 
 export async function heartbeat(data: { request: {} }): Promise<object> {

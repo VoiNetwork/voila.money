@@ -25,6 +25,7 @@ export const SecureMessageTypes = {
   removeAccount: 'removeAccount',
   createBackup: 'createBackup',
   importBackup: 'importBackup',
+  signTokenTransactions: 'signTokenTransactions',
   signTransactions: 'signTransactions',
   lock: 'lock',
   refresh: 'refresh',
@@ -195,6 +196,12 @@ export class SecureStorage {
   async createBackup(password: string): Promise<string> {
     return await this.handleMessage(SecureMessageTypes.createBackup, {
       password,
+    });
+  }
+
+  async signTokenTransactions(request: any): Promise<any> {
+    return await this.handleMessage(SecureMessageTypes.signTokenTransactions, {
+      request,
     });
   }
 

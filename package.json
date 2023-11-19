@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "algosdk": "^2.7.0",
-    "arc200js": "^1.2.3",
+    "arc200js": "^1.2.19",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.1.1",

@@ -31,6 +31,7 @@ import {
   algod,
   indexer,
   accounts,
+  signTokenTransactions,
 } from './internalMethods'
 
 const SecureMessageListenerFunctionMap: Record<
@@ -52,6 +53,7 @@ const SecureMessageListenerFunctionMap: Record<
   [SecureMessageTypes.importBackup]: importBackup,
   [SecureMessageTypes.lock]: lock,
   [SecureMessageTypes.refresh]: refresh,
+  [SecureMessageTypes.signTokenTransactions] : signTokenTransactions,
   [SecureMessageTypes.signTransactions]: signTransactions,
 
   //dApp Messages

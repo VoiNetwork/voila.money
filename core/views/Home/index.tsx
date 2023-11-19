@@ -52,6 +52,7 @@ const Home: React.FC = () => {
       })();
     }
   }, [account, tokens]);
+  
   const tokenBalance = Math.max(
     account ? account.amount - account['min-balance'] : 0,
     0
